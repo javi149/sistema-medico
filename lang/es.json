@@ -1,0 +1,12 @@
+{
+    "Name": "Nombre",
+    "Email": "Correo Electrónico",
+    "Password": "Contraseña",
+    "Confirm Password": "Confirmar Contraseña",
+    "Already registered?": "¿Ya estás registrado?",
+    "Register": "Registrarse",
+    "Log in": "Iniciar Sesión",
+    "Remember me": "Recordarme",
+    "Forgot your password?": "¿Olvidaste tu contraseña?",
+    "These credentials do not match our records.": "Las credenciales proporcionadas no coinciden con nuestros registros."
+}
