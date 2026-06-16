@@ -12,8 +12,7 @@ class StoreSpecialtyRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // Por ahora lo dejamos en true para permitir que pase la validación de roles de Spatie que pondremos después
-        return true;
+        return $this->user() !== null && $this->user()->hasRole('admin');
     }
 
     public function rules(): array
