@@ -2,29 +2,31 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class RoleSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Crear los roles del sistema
-        $roleAdmin = Role::create(['name' => 'Administrador']);
-        $roleMedico = Role::create(['name' => 'Medico']);
-        $rolePaciente = Role::create(['name' => 'Paciente']);
+        $roleAdmin = Role::firstOrCreate(['name' => 'admin']);
+        $roleMedico = Role::firstOrCreate(['name' => 'medico']);
+        $rolePaciente = Role::firstOrCreate(['name' => 'paciente']);
 
-        // 2. Crear al usuario Administrador raíz (SuperAdmin)
-        $admin = User::create([
-            'name' => 'Admin Sistema',
-            'rut' => '11111111-1',
-            'email' => 'admin@clinica.cl',
-            'password' => Hash::make('password123'), // Contraseña segura por defecto
-        ]);
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@clinica.cl'],
+            [
+                'name' => 'Admin Sistema',
+                'rut' => '11111111-1',
+                'password' => Hash::make('password123'),
+                'email_verified_at' => now(),
+            ]
+        );
 
-        // 3. Asignarle el rol de Administrador al usuario recién creado
-        $admin->assignRole($roleAdmin);
+        if (! $admin->hasRole('admin')) {
+            $admin->assignRole($roleAdmin);
+        }
     }
 }

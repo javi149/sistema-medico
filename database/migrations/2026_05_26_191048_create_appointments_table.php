@@ -10,25 +10,28 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('appointments', function (Blueprint $table) {
-        $table->id();
-        
-        // El paciente es simplemente un 'user' en nuestro sistema
-        $table->foreignId('patient_id')->constrained('users')->cascadeOnDelete(); 
-        
-        $table->foreignId('professional_profile_id')->constrained()->cascadeOnDelete();
-        
-        $table->date('date'); // El día específico (ej. 2026-06-01)
-        $table->time('start_time'); // A qué hora inicia (ej. '08:30:00')
-        $table->time('end_time'); // A qué hora termina (ej. '09:00:00')
-        
-        // Estado de la cita (Agendada, Confirmada, Ausente, Atendida)
-        $table->string('status')->default('Agendada'); 
-        
-        $table->timestamps();
-    });
-}
+    {
+        Schema::create('appointments', function (Blueprint $table) {
+            $table->id();
+            
+            // 1. Llave foránea del paciente (Apunta a la tabla users)
+            $table->foreignId('patient_id')->constrained('users')->onDelete('cascade');
+            
+            // 2. Llave foránea del perfil del médico
+            $table->foreignId('professional_profile_id')->constrained()->onDelete('cascade');
+            
+            // 3. Llave foránea de la especialidad a atender
+            $table->foreignId('specialty_id')->constrained()->onDelete('cascade');
+            
+            // Fecha y hora exacta de la cita
+            $table->timestamp('start_datetime');
+            
+            // Estado de la cita (por defecto siempre nacerá como 'reservada')
+            $table->string('status', 20)->default('reservada');
+            
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.

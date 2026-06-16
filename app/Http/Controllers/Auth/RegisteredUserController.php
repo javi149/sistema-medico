@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
+use Spatie\Permission\Models\Role;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -39,16 +40,18 @@ class RegisteredUserController extends Controller
 
         $user = User::create([
             'name' => $request->name,
-            'rut' => $request->rut, // Guardamos el RUT
+            'rut' => $request->rut,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'email_verified_at' => now(),
         ]);
-        
+
+        $user->assignRole(Role::firstOrCreate(['name' => 'paciente']));
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('citas.index', absolute: false));
     }
 }

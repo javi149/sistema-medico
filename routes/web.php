@@ -1,6 +1,12 @@
 <?php
 
+use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SpecialtyController;
+use App\Http\Controllers\ProfessionalProfileController;
+use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\PacienteController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -8,8 +14,22 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
+    $user = auth()->user();
+
+    if ($user->hasRole('admin')) {
+        return redirect()->route('admin.dashboard');
+    }
+
+    if ($user->hasRole('medico')) {
+        return redirect()->route('medico.dashboard');
+    }
+
+    if ($user->hasRole('paciente')) {
+        return redirect()->route('citas.index');
+    }
+
     return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -18,3 +38,46 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+// ==========================================================
+// 2. UNIFICAMOS TODAS LAS RUTAS DEL ADMINISTRADOR AQUÍ
+// ==========================================================
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    
+    // Panel de control diario (Dashboard)
+    Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+
+    Route::get('/admin/usuarios/medico/crear', [AdminUserController::class, 'createMedico'])->name('admin.users.create-medico');
+    Route::post('/admin/usuarios/medico', [AdminUserController::class, 'storeMedico'])->name('admin.users.store-medico');
+    
+    // CRUD de Especialidades Médicas
+    Route::resource('especialidades', SpecialtyController::class);
+    
+    // CRUD de Perfiles Médicos
+    Route::resource('perfiles', ProfessionalProfileController::class);
+
+    // CRUD de Pacientes
+    Route::resource('pacientes', PacienteController::class);
+
+});
+
+// ==========================================================
+// 3. RUTAS DEL PACIENTE
+// ==========================================================
+Route::middleware(['auth', 'role:paciente'])->group(function () {
+    
+    Route::resource('citas', AppointmentController::class)->only(['create', 'store', 'index']);
+    
+    // LA NUEVA RUTA PARA CANCELAR
+    Route::patch('/citas/{cita}/cancelar', [AppointmentController::class, 'cancelar'])->name('citas.cancelar');
+
+});
+// ==========================================================
+// 4. RUTAS DEL MÉDICO
+// ==========================================================
+Route::middleware(['auth', 'role:medico'])->group(function () {
+    
+    // Panel de control diario del Doctor
+    Route::get('/medico/dashboard', [App\Http\Controllers\DoctorDashboardController::class, 'index'])->name('medico.dashboard');
+
+});
