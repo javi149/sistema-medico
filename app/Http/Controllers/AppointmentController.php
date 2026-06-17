@@ -37,8 +37,8 @@ class AppointmentController extends Controller
     {
         $appointment = Appointment::findOrFail($id);
         
-        // Aquí actualizas los campos que vengan del formulario (ej: fecha, hora)
-        // $appointment->start_time = $request->input('start_time');
+        // Actualizar los campos que vengan en la petición (fecha, hora de inicio, hora de término)
+        $appointment->fill($request->only(['date', 'start_time', 'end_time']));
         
         $appointment->status = 'Modificada';
         $appointment->save();
