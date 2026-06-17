@@ -28,6 +28,7 @@ class UserFactory extends Factory
         return [
             'name' => fake()->name(),
             'rut' => fake()->unique()->numerify('########-#'), // Genera un RUT falso de 8 números y un dígito
+            'rut' => fake()->unique()->numerify('##.###.###-#'),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
