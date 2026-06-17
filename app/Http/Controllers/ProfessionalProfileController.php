@@ -27,10 +27,10 @@ class ProfessionalProfileController extends Controller
      */
     public function create()
     {
-        $users = User::role('medico')->doesntHave('professionalProfile')->get();
-        $specialties = Specialty::all();
+        $medicos = User::role('medico')->doesntHave('professionalProfile')->get();
+        $especialidades = Specialty::all();
 
-        return view('perfiles.create', compact('users', 'specialties'));
+        return view('perfiles.create', compact('medicos', 'especialidades'));
     }
 
     /**
