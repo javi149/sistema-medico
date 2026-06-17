@@ -48,4 +48,11 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    /**
+     * Relación Uno a Uno: Un usuario (si es médico) tiene un perfil profesional.
+     */
+    public function professionalProfile()
+    {
+        return $this->hasOne(ProfessionalProfile::class);
+    }
 }
