@@ -7,6 +7,7 @@ use App\Http\Controllers\SpecialtyController;
 use App\Http\Controllers\ProfessionalProfileController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\PacienteController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -58,6 +59,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     // CRUD de Pacientes
     Route::resource('pacientes', PacienteController::class);
+
+    // Reportes de Gestión (Tu módulo)
+    Route::get('/admin/reportes', [ReportController::class, 'index'])->name('reportes.index');
 
 });
 
