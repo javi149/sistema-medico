@@ -40,68 +40,42 @@ class DatabaseSeeder extends Seeder
         // El UserFactory ya asigna rol 'paciente' automáticamente en afterCreating
 
         // =====================================================
-        // 3. TABLA MANTENEDORA: MÉDICOS + PERFILES (10 registros)
+        // 3. TABLA MANTENEDORA: MÉDICOS + PERFILES (4 por especialidad)
         // =====================================================
-        $this->command->info('Creando 10 médicos con perfiles profesionales...');
-
-        $medicosData = [
-            ['name' => 'Dr. Carlos Méndez',    'rut' => '12345678-9', 'email' => 'carlos.mendez@clinica.cl'],
-            ['name' => 'Dra. Ana Torres',       'rut' => '98765432-1', 'email' => 'ana.torres@clinica.cl'],
-            ['name' => 'Dr. Luis Rojas',        'rut' => '11223344-5', 'email' => 'luis.rojas@clinica.cl'],
-            ['name' => 'Dra. María González',   'rut' => '15678234-0', 'email' => 'maria.gonzalez@clinica.cl'],
-            ['name' => 'Dr. Roberto Soto',      'rut' => '16789345-1', 'email' => 'roberto.soto@clinica.cl'],
-            ['name' => 'Dra. Camila Vargas',    'rut' => '17890456-2', 'email' => 'camila.vargas@clinica.cl'],
-            ['name' => 'Dr. Felipe Muñoz',      'rut' => '18901567-3', 'email' => 'felipe.munoz@clinica.cl'],
-            ['name' => 'Dra. Valentina Díaz',   'rut' => '19012678-4', 'email' => 'valentina.diaz@clinica.cl'],
-            ['name' => 'Dr. Andrés Cifuentes',  'rut' => '20123789-5', 'email' => 'andres.cifuentes@clinica.cl'],
-            ['name' => 'Dra. Francisca Reyes',  'rut' => '21234890-6', 'email' => 'francisca.reyes@clinica.cl'],
-        ];
-
-        $biografias = [
-            'Médico con más de 15 años de experiencia clínica en atención hospitalaria y ambulatoria.',
-            'Especialista formada en la Universidad de Chile con subespecialidad en el área pediátrica.',
-            'Profesional con vasta trayectoria en medicina de urgencia y cuidados intensivos.',
-            'Cirujana con experiencia internacional y múltiples publicaciones en revistas indexadas.',
-            'Especialista con enfoque en medicina preventiva y educación en salud comunitaria.',
-            'Investigadora activa con más de 20 publicaciones en el área de enfermedades crónicas.',
-            'Médico deportivo con experiencia en selecciones nacionales y clubes profesionales.',
-            'Especialista en salud mental con formación en terapia cognitivo-conductual.',
-            'Cirujano con subespecialidad en técnicas mínimamente invasivas y laparoscópicas.',
-            'Médico integral con amplia experiencia en zonas rurales y atención primaria.',
-        ];
+        $this->command->info('Creando 4 médicos por cada especialidad (' . ($specialties->count() * 4) . ' en total)...');
 
         $perfiles = [];
+        $rutCounter = 10000000;
+        $defaultPassword = Hash::make('password123');
 
-        foreach ($medicosData as $i => $data) {
-            $medico = User::firstOrCreate(
-                ['email' => $data['email']],
-                [
-                    'name' => $data['name'],
-                    'rut' => $data['rut'],
-                    'password' => Hash::make('password123'),
+        foreach ($specialties as $specialty) {
+            for ($i = 0; $i < 4; $i++) {
+                // Alternar entre hombre y mujer para las imágenes
+                $isFemale = ($i % 2 === 0);
+                $name = $isFemale ? 'Dra. ' . fake()->firstNameFemale() . ' ' . fake()->lastName() : 'Dr. ' . fake()->firstNameMale() . ' ' . fake()->lastName();
+                $email = fake()->unique()->safeEmail();
+                $rut = strval($rutCounter++) . '-' . rand(0, 9);
+
+                $medico = User::create([
+                    'name' => $name,
+                    'rut' => $rut,
+                    'email' => $email,
+                    'password' => $defaultPassword,
                     'email_verified_at' => now(),
-                ]
-            );
-
-            if (! $medico->hasRole('medico')) {
-                $medico->assignRole($roleMedico);
-            }
-
-            if (! $medico->professionalProfile) {
-                $profile = ProfessionalProfile::create([
-                    'user_id' => $medico->id,
-                    'bio' => $biografias[$i],
-                    'consultation_duration_minutes' => fake()->randomElement([15, 20, 30, 30, 30, 45]),
                 ]);
 
-                // Cada médico tiene 1 a 3 especialidades
-                $profile->specialties()->attach(
-                    $specialties->random(rand(1, 3))->pluck('id')
-                );
+                $medico->assignRole($roleMedico);
+
+                $profile = ProfessionalProfile::create([
+                    'user_id' => $medico->id,
+                    'bio' => fake()->realText(100),
+                    'consultation_duration_minutes' => 30, // Fijar en 30 para simplificar
+                ]);
+
+                // Asignar exclusivamente a esta especialidad
+                $profile->specialties()->attach($specialty->id);
 
                 $perfiles[] = $profile;
-            } else {
-                $perfiles[] = $medico->professionalProfile;
             }
         }
 

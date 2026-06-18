@@ -45,7 +45,7 @@ class ProfessionalProfileController extends Controller
         // 2. Creamos el perfil profesional en la base de datos
         $profile = ProfessionalProfile::create([
             'user_id' => $validatedData['user_id'],
-            'bio' => $validatedData['bio'],
+            'bio' => $validatedData['bio'] ?? null,
             'consultation_duration_minutes' => $validatedData['consultation_duration_minutes'],
         ]);
 
