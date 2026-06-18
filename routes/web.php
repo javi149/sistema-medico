@@ -9,6 +9,8 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\PacienteController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 Route::get('/', function () {
     $specialties = \App\Models\Specialty::limit(8)->get();
@@ -22,7 +24,11 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    $user = auth()->user();
+    $user = Auth::user();
+
+    if (!$user) {
+        return redirect()->route('login');
+    }
 
     if ($user->hasRole('admin')) {
         return redirect()->route('admin.dashboard');

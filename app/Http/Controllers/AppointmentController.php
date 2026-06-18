@@ -52,7 +52,7 @@ class AppointmentController extends Controller
                 // lockForUpdate() bloquea las filas que coincidan para que nadie más las lea mientras guardamos.
                 $conflicto = Appointment::where('professional_profile_id', $request->professional_profile_id)
                     ->where('start_datetime', $request->start_datetime)
-                    ->whereIn('status', ['reservada', 'confirmada']) // Si está cancelada, no es conflicto
+                    ->whereIn('status', ['reservada', 'confirmada', 'Modificada', 'modificada']) // Si está cancelada, no es conflicto
                     ->lockForUpdate()
                     ->first();
 
@@ -298,7 +298,7 @@ class AppointmentController extends Controller
 
         $allAppointments = Appointment::whereIn('professional_profile_id', $doctorIds)
             ->whereDate('start_datetime', $date)
-            ->whereIn('status', ['reservada', 'confirmada'])
+            ->whereIn('status', ['reservada', 'confirmada', 'Modificada', 'modificada'])
             ->get()
             ->groupBy('professional_profile_id');
 
