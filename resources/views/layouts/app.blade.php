@@ -245,6 +245,10 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
                     Especialidades
                 </a>
+                <a href="{{ route('reportes.index') }}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                    Reportes
+                </a>
                 
                 <p class="section-label">Ajustes</p>
                 <a href="{{ route('admin.users.create-medico') }}">

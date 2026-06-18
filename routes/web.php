@@ -7,11 +7,18 @@ use App\Http\Controllers\SpecialtyController;
 use App\Http\Controllers\ProfessionalProfileController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\PacienteController;
-use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    $specialties = \App\Models\Specialty::limit(8)->get();
+    
+    // Obtenemos todos los médicos (que tienen perfil profesional)
+    $doctors = \App\Models\User::has('professionalProfile')
+        ->with('professionalProfile.specialties')
+        ->get();
+    
+    return view('welcome', compact('specialties', 'doctors'));
 });
 
 Route::get('/dashboard', function () {
@@ -64,14 +71,26 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // CRUD de Pacientes
     Route::resource('pacientes', PacienteController::class);
 
+    // Reportes de Gestión (Tu módulo)
+    Route::get('/admin/reportes', [ReportController::class, 'index'])->name('reportes.index');
+
 });
+
+// ==========================================================
+// RUTAS PÚBLICAS DE RESERVAS (WIZARD)
+// ==========================================================
+Route::get('/citas/create', [AppointmentController::class, 'create'])->name('citas.create');
+Route::post('/citas', [AppointmentController::class, 'store'])->name('citas.store');
+Route::get('/citas/{cita}/success', [AppointmentController::class, 'success'])->name('citas.success');
+Route::post('/citas/wizard/check-rut', [AppointmentController::class, 'checkRut'])->name('wizard.check-rut');
+Route::get('/citas/wizard/availability', [AppointmentController::class, 'getAvailability'])->name('wizard.availability');
 
 // ==========================================================
 // 3. RUTAS DEL PACIENTE
 // ==========================================================
 Route::middleware(['auth', 'role:paciente'])->group(function () {
     
-    Route::resource('citas', AppointmentController::class)->only(['create', 'store', 'index']);
+    Route::get('/citas', [AppointmentController::class, 'index'])->name('citas.index');
     
     // LA NUEVA RUTA PARA CANCELAR
     Route::patch('/citas/{cita}/cancelar', [AppointmentController::class, 'cancelar'])->name('citas.cancelar');

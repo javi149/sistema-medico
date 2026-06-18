@@ -27,10 +27,10 @@ class ProfessionalProfileController extends Controller
      */
     public function create()
     {
-        $users = User::role('medico')->doesntHave('professionalProfile')->get();
-        $specialties = Specialty::all();
+        $medicos = User::role('medico')->doesntHave('professionalProfile')->get();
+        $especialidades = Specialty::all();
 
-        return view('perfiles.create', compact('users', 'specialties'));
+        return view('perfiles.create', compact('medicos', 'especialidades'));
     }
 
     /**
@@ -45,7 +45,7 @@ class ProfessionalProfileController extends Controller
         // 2. Creamos el perfil profesional en la base de datos
         $profile = ProfessionalProfile::create([
             'user_id' => $validatedData['user_id'],
-            'bio' => $validatedData['bio'],
+            'bio' => $validatedData['bio'] ?? null,
             'consultation_duration_minutes' => $validatedData['consultation_duration_minutes'],
         ]);
 

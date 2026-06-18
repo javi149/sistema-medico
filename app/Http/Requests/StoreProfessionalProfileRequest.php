@@ -29,7 +29,7 @@ class StoreProfessionalProfileRequest extends FormRequest
     {
         return [
             'user_id' => 'required|exists:users,id|unique:professional_profiles,user_id',
-            'bio' => 'required|string|max:1000',
+            'bio' => 'nullable|string|max:1000',
             'consultation_duration_minutes' => 'required|integer|min:15|max:60',
             'specialties' => 'required|array|min:1',
             'specialties.*' => 'exists:specialties,id',
