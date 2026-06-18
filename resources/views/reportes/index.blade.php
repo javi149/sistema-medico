@@ -41,7 +41,9 @@
     <!-- Grafico Ocupacion -->
     <div class="card">
         <h3 style="margin-top: 0; margin-bottom: 20px; color: var(--text-main);">Ocupación por Médico</h3>
-        <div id="chart-ocupacion" style="min-height: 300px;"></div>
+        <div style="max-height: 350px; overflow-y: auto; overflow-x: hidden; padding-right: 5px;">
+            <div id="chart-ocupacion" style="min-height: 300px;"></div>
+        </div>
     </div>
 
     <!-- Grafico Lista de espera -->
@@ -109,7 +111,7 @@
             }],
             chart: {
                 type: 'bar',
-                height: 300,
+                height: Math.max(300, nombresOcupacion.length * 25), // Altura dinámica: 25px por cada médico, mínimo 300px
                 toolbar: { show: false },
                 fontFamily: 'inherit'
             },
