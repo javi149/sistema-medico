@@ -10,7 +10,7 @@
     <div style="background-color: #161b22; padding: 15px; border-radius: 5px; margin: 20px 0; border: 1px solid #30363d;">
         <p><strong>Detalles de la Cita:</strong></p>
         <ul>
-            <li><strong>Fecha y Hora:</strong> {{ $appointment->start_time }}</li>
+            <li><strong>Fecha y Hora:</strong> {{ \Carbon\Carbon::parse($appointment->start_datetime)->format('d-m-Y H:i') }}</li>
             <li><strong>Estado Actual:</strong> {{ $appointment->status }}</li>
         </ul>
     </div>

@@ -22,15 +22,20 @@ class AppointmentNotificationTest extends TestCase
     {
         parent::setUp();
 
+        // Sembrar los roles definidos en la aplicación
+        $this->seed(\Database\Seeders\RoleSeeder::class);
+
         // 1. Crear usuario paciente
         $this->patient = User::factory()->create([
             'email' => 'paciente@example.com',
         ]);
+        $this->patient->assignRole('paciente');
 
         // 2. Crear usuario médico
         $this->doctor = User::factory()->create([
             'email' => 'medico@example.com',
         ]);
+        $this->doctor->assignRole('medico');
 
         // 3. Crear perfil profesional para el médico
         $this->profileId = DB::table('professional_profiles')->insertGetId([
@@ -49,13 +54,15 @@ class AppointmentNotificationTest extends TestCase
     {
         Mail::fake();
 
+        // Crear una especialidad para asociarla a la cita
+        $specialty = \App\Models\Specialty::create(['name' => 'Pediatría']);
+
         // Crear una cita médica
         $appointment = Appointment::create([
             'patient_id' => $this->patient->id,
             'professional_profile_id' => $this->profileId,
-            'date' => '2026-06-20',
-            'start_time' => '10:00:00',
-            'end_time' => '10:30:00',
+            'specialty_id' => $specialty->id,
+            'start_datetime' => '2026-06-20 10:00:00',
             'status' => 'Agendada',
         ]);
 
@@ -88,21 +95,21 @@ class AppointmentNotificationTest extends TestCase
     {
         Mail::fake();
 
+        // Crear una especialidad para asociarla a la cita
+        $specialty = \App\Models\Specialty::create(['name' => 'Pediatría']);
+
         // Crear una cita médica
         $appointment = Appointment::create([
             'patient_id' => $this->patient->id,
             'professional_profile_id' => $this->profileId,
-            'date' => '2026-06-20',
-            'start_time' => '10:00:00',
-            'end_time' => '10:30:00',
+            'specialty_id' => $specialty->id,
+            'start_datetime' => '2026-06-20 10:00:00',
             'status' => 'Agendada',
         ]);
 
         // Nuevos datos para la cita
         $newDetails = [
-            'date' => '2026-06-25',
-            'start_time' => '11:00:00',
-            'end_time' => '11:30:00',
+            'start_datetime' => '2026-06-25 11:00:00',
         ];
 
         // Realizar petición como paciente autenticado
@@ -116,9 +123,7 @@ class AppointmentNotificationTest extends TestCase
         // Verificar cambios en base de datos
         $this->assertDatabaseHas('appointments', [
             'id' => $appointment->id,
-            'date' => '2026-06-25',
-            'start_time' => '11:00:00',
-            'end_time' => '11:30:00',
+            'start_datetime' => '2026-06-25 11:00:00',
             'status' => 'Modificada',
         ]);
 
@@ -127,8 +132,105 @@ class AppointmentNotificationTest extends TestCase
             return $mail->hasTo('paciente@example.com') &&
                    $mail->actionType === 'Modificada' &&
                    $mail->appointment->status === 'Modificada' &&
-                   $mail->appointment->date === '2026-06-25' &&
-                   $mail->appointment->start_time === '11:00:00';
+                   $mail->appointment->start_datetime === '2026-06-25 11:00:00';
         });
+    }
+
+    /**
+     * Test que verifica que el paciente puede ver el formulario de reprogramación y reprogramar.
+     */
+    public function test_patient_can_view_reschedule_page_and_update_appointment(): void
+    {
+        Mail::fake();
+        $specialty = \App\Models\Specialty::create(['name' => 'Kinesiología']);
+
+        $appointment = Appointment::create([
+            'patient_id' => $this->patient->id,
+            'professional_profile_id' => $this->profileId,
+            'specialty_id' => $specialty->id,
+            'start_datetime' => '2026-06-20 10:00:00',
+            'status' => 'reservada',
+        ]);
+
+        // 1. Verificar acceso a la vista edit
+        $responseEdit = $this->actingAs($this->patient)
+            ->get("/citas/{$appointment->id}/edit");
+        $responseEdit->assertStatus(200);
+
+        // 2. Reprogramar la cita
+        $responseUpdate = $this->actingAs($this->patient)
+            ->patch("/citas/{$appointment->id}", [
+                'start_datetime' => '2026-06-25 15:30:00'
+            ]);
+
+        $responseUpdate->assertRedirect('/citas');
+        $responseUpdate->assertSessionHas('success');
+
+        $this->assertDatabaseHas('appointments', [
+            'id' => $appointment->id,
+            'start_datetime' => '2026-06-25 15:30:00',
+            'status' => 'Modificada',
+        ]);
+
+        Mail::assertSent(AppointmentNotification::class);
+    }
+
+    /**
+     * Test que verifica que el administrador puede agendar, reprogramar y eliminar citas.
+     */
+    public function test_admin_can_schedule_reschedule_and_delete_appointment(): void
+    {
+        Mail::fake();
+        
+        $admin = User::where('email', 'admin@clinica.cl')->first(); // Creado por el RoleSeeder
+        if (!$admin) {
+            $admin = User::factory()->create();
+            $admin->assignRole('admin');
+        }
+
+        $specialty = \App\Models\Specialty::create(['name' => 'Cardiología']);
+        // Vincular especialidad al médico
+        DB::table('professional_profile_specialty')->insert([
+            'professional_profile_id' => $this->profileId,
+            'specialty_id' => $specialty->id
+        ]);
+
+        // 1. Agendar cita por Admin
+        $responseStore = $this->actingAs($admin)
+            ->post('/admin/appointments', [
+                'patient_id' => $this->patient->id,
+                'professional_profile_id' => $this->profileId,
+                'start_datetime' => '2026-06-22 09:00:00'
+            ]);
+
+        $responseStore->assertRedirect('/admin/dashboard?date=2026-06-22');
+        
+        $appointment = Appointment::where('patient_id', $this->patient->id)
+            ->where('start_datetime', '2026-06-22 09:00:00')
+            ->first();
+        
+        $this->assertNotNull($appointment);
+
+        // 2. Reprogramar cita por Admin
+        $responseUpdate = $this->actingAs($admin)
+            ->patch("/admin/appointments/{$appointment->id}", [
+                'start_datetime' => '2026-06-22 11:30:00'
+            ]);
+
+        $responseUpdate->assertRedirect('/admin/dashboard?date=2026-06-22');
+        $this->assertDatabaseHas('appointments', [
+            'id' => $appointment->id,
+            'start_datetime' => '2026-06-22 11:30:00',
+            'status' => 'Modificada',
+        ]);
+
+        // 3. Eliminar cita por Admin
+        $responseDelete = $this->actingAs($admin)
+            ->delete("/admin/appointments/{$appointment->id}");
+
+        $responseDelete->assertRedirect();
+        $this->assertDatabaseMissing('appointments', [
+            'id' => $appointment->id
+        ]);
     }
 }

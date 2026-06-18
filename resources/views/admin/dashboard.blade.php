@@ -5,10 +5,17 @@
     <div class="top-bar">
         <div>
             <h1 class="page-title">Control Diario de Citas</h1>
-            <p class="page-subtitle">Gestión y supervisión de la agenda clínica para hoy.</p>
+            <p class="page-subtitle">Gestión y supervisión de la agenda clínica.</p>
         </div>
-        <div style="text-align: right; color: var(--text-muted); font-size: 0.9rem; font-weight: 500;">
-            {{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <form action="{{ route('admin.dashboard') }}" method="GET" style="display: flex; align-items: center; gap: 10px; margin: 0;">
+                <label for="date-select" style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Agenda del día:</label>
+                <input type="date" id="date-select" name="date" value="{{ $hoy->format('Y-m-d') }}" onchange="this.form.submit()" style="padding: 8px 12px; border-radius: 50px; border: 1px solid var(--border-color); font-family: inherit; font-size: 0.9rem; outline: none; background: white; color: var(--text-main); font-weight: 600; cursor: pointer; transition: all 0.2s;" onfocus="this.style.borderColor='var(--primary-light)'" onblur="this.style.borderColor='var(--border-color)'">
+            </form>
+            <a href="{{ route('admin.appointments.create') }}" class="btn btn-primary" style="padding: 8px 18px; font-size: 0.85rem;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Agendar Hora
+            </a>
         </div>
     </div>
 
@@ -83,6 +90,7 @@
                         <th>Médico Asignado</th>
                         <th>Especialidad</th>
                         <th>Estado</th>
+                        <th style="text-align: right;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -95,14 +103,37 @@
                             <td>
                                 @php
                                     $badgeClass = 'badge-neutral';
-                                    if(in_array($cita->status, ['reservada', 'confirmada'])) $badgeClass = 'badge-success';
-                                    if($cita->status == 'cancelada') $badgeClass = 'badge-danger';
-                                    if($cita->status == 'ausente') $badgeClass = 'badge-warning';
-                                    if($cita->status == 'atendida') $badgeClass = 'badge-info';
+                                    $statusLower = strtolower($cita->status);
+                                    if(in_array($statusLower, ['reservada', 'confirmada', 'modificada'])) $badgeClass = 'badge-success';
+                                    if($statusLower == 'cancelada') $badgeClass = 'badge-danger';
+                                    if($statusLower == 'ausente') $badgeClass = 'badge-warning';
+                                    if($statusLower == 'atendida') $badgeClass = 'badge-info';
                                 @endphp
                                 <span class="badge {{ $badgeClass }}">
-                                    {{ $cita->status }}
+                                    {{ ucfirst($cita->status) }}
                                 </span>
+                            </td>
+                            <td>
+                                <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
+                                    @if(in_array(strtolower($cita->status), ['reservada', 'confirmada', 'modificada']))
+                                        <a href="{{ route('admin.appointments.edit', $cita->id) }}" class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem; color: var(--primary); border-color: var(--primary);">
+                                            Reagendar
+                                        </a>
+                                        <form action="{{ route('appointments.cancel', $cita->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas cancelar esta cita?');" style="margin: 0;">
+                                            @csrf
+                                            <button type="submit" class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem; color: var(--status-warning); border-color: var(--status-warning);">
+                                                Cancelar
+                                            </button>
+                                        </form>
+                                    @endif
+                                    <form action="{{ route('admin.appointments.destroy', $cita->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar permanentemente esta cita? Esta acción no se puede deshacer.');" style="margin: 0;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem; color: var(--status-danger); border-color: var(--status-danger);">
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @endforeach
