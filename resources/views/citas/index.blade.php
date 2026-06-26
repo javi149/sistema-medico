@@ -51,14 +51,19 @@
                                 </span>
                             </td>
                             <td>
-                                @if(in_array($cita->status, ['reservada', 'confirmada']))
-                                    <form action="{{ route('citas.cancelar', $cita->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas cancelar esta cita?');">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem; color: var(--status-danger); border-color: var(--status-danger);">
-                                            Cancelar Cita
-                                        </button>
-                                    </form>
+                                @if(in_array(strtolower($cita->status), ['reservada', 'confirmada', 'modificada']))
+                                    <div style="display: flex; gap: 8px;">
+                                        <a href="{{ route('citas.edit', $cita->id) }}" class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem; color: var(--primary); border-color: var(--primary);">
+                                            Modificar
+                                        </a>
+                                        <form action="{{ route('citas.cancelar', $cita->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas cancelar esta cita?');" style="margin: 0;">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem; color: var(--status-danger); border-color: var(--status-danger);">
+                                                Cancelar
+                                            </button>
+                                        </form>
+                                    </div>
                                 @else
                                     <span style="color: var(--text-muted); font-size: 0.85rem;">No disponible</span>
                                 @endif

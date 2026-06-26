@@ -36,7 +36,19 @@ class DatabaseSeeder extends Seeder
         // 2. TABLA MANTENEDORA: PACIENTES (60 registros)
         // =====================================================
         $this->command->info('Creando 60 pacientes...');
-        $pacientes = User::factory(60)->create();
+        
+        $testPaciente = User::firstOrCreate(
+            ['email' => 'adanramos@alu.unach.cl'],
+            [
+                'name' => 'Adán Ramos',
+                'rut' => '12.345.678-9',
+                'password' => Hash::make('password123'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $testPaciente->assignRole($rolePaciente);
+
+        $pacientes = User::factory(59)->create();
         // El UserFactory ya asigna rol 'paciente' automáticamente en afterCreating
 
         // =====================================================

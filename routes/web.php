@@ -9,6 +9,8 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\PacienteController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 Route::get('/', function () {
     $specialties = \App\Models\Specialty::limit(8)->get();
@@ -24,7 +26,11 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    $user = auth()->user();
+    $user = Auth::user();
+
+    if (!$user) {
+        return redirect()->route('login');
+    }
 
     if ($user->hasRole('admin')) {
         return redirect()->route('admin.dashboard');
@@ -76,6 +82,13 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Reportes de Gestión (Tu módulo)
     Route::get('/admin/reportes', [ReportController::class, 'index'])->name('reportes.index');
 
+    // Gestión de Citas Médicas por el Administrador
+    Route::get('/admin/appointments/create', [AppointmentController::class, 'adminCreate'])->name('admin.appointments.create');
+    Route::post('/admin/appointments', [AppointmentController::class, 'adminStore'])->name('admin.appointments.store');
+    Route::get('/admin/appointments/{appointment}/edit', [AppointmentController::class, 'adminEdit'])->name('admin.appointments.edit');
+    Route::patch('/admin/appointments/{appointment}', [AppointmentController::class, 'adminUpdate'])->name('admin.appointments.update');
+    Route::delete('/admin/appointments/{appointment}', [AppointmentController::class, 'adminDestroy'])->name('admin.appointments.destroy');
+
 });
 
 // ==========================================================
@@ -96,6 +109,10 @@ Route::middleware(['auth', 'role:paciente'])->group(function () {
     
     // LA NUEVA RUTA PARA CANCELAR
     Route::patch('/citas/{cita}/cancelar', [AppointmentController::class, 'cancelar'])->name('citas.cancelar');
+
+    // RUTAS PARA MODIFICAR
+    Route::get('/citas/{cita}/edit', [AppointmentController::class, 'edit'])->name('citas.edit');
+    Route::patch('/citas/{cita}', [AppointmentController::class, 'updatePaciente'])->name('citas.update');
 
 });
 // ==========================================================
