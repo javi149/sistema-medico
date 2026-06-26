@@ -26,6 +26,7 @@
                         <th>Email</th>
                         <th>Duración Consulta</th>
                         <th>Especialidades</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -38,6 +39,14 @@
                                 @foreach($perfil->specialties as $especialidad)
                                     <span class="badge badge-info" style="margin-right: 5px; margin-bottom: 5px; display: inline-block;">{{ $especialidad->name }}</span>
                                 @endforeach
+                            </td>
+                            <td>
+                                <a href="{{ route('perfiles.edit', $perfil) }}" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.85rem;">Editar</a>
+                                <form action="{{ route('perfiles.destroy', $perfil) }}" method="POST" style="display:inline;" onsubmit="return confirm('¿Estás seguro de eliminar este perfil profesional?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.85rem;">Eliminar</button>
+                                </form>
                             </td>
                         </tr>
                     @endforeach

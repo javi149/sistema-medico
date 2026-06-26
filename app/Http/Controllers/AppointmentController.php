@@ -146,14 +146,11 @@ class AppointmentController extends Controller
         $appointment = Appointment::findOrFail($id);
 
         // 2. Cambiar el estado a Cancelada
-        $appointment->status = 'Cancelada';
+        $appointment->status = 'cancelada';
         $appointment->save();
 
-        // 3. Obtener el correo del usuario asociado a la cita
-        // $userEmail = $appointment->user->email; // Nota: si existe relacion user
-
-        // 4. Enviar el correo usando Mailtrap
-        // Mail::to($userEmail)->send(new AppointmentNotification($appointment, 'Cancelada'));
+        // 3. Enviar correo de notificación
+        \Illuminate\Support\Facades\Mail::to($appointment->patient->email)->send(new \App\Mail\AppointmentNotification($appointment, 'Cancelada'));
 
         return redirect()->back()->with('success', 'Cita cancelada con éxito y notificación enviada.');
     }
@@ -163,6 +160,11 @@ class AppointmentController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'start_datetime' => 'sometimes|date|after:now',
+            'specialty_id' => 'sometimes|exists:specialties,id',
+        ]);
+
         $appointment = Appointment::findOrFail($id);
         
         // Actualizar los campos que vengan en la petición (fecha, hora de inicio, hora de término)
@@ -171,10 +173,8 @@ class AppointmentController extends Controller
         $appointment->status = 'Modificada';
         $appointment->save();
 
-        // $userEmail = $appointment->user->email; 
-
-        // Enviar notificación de modificación
-        // Mail::to($userEmail)->send(new AppointmentNotification($appointment, 'Modificada'));
+        // Enviar correo de notificación de modificación
+        \Illuminate\Support\Facades\Mail::to($appointment->patient->email)->send(new \App\Mail\AppointmentNotification($appointment, 'Modificada'));
 
         return redirect()->back()->with('success', 'Cita modificada con éxito y notificación enviada.');
     }

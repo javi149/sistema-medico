@@ -24,6 +24,7 @@
                     <tr>
                         <th>Nombre</th>
                         <th>Descripción</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -31,6 +32,14 @@
                         <tr>
                             <td style="font-weight: 600; color: var(--primary);">{{ $especialidad->name }}</td>
                             <td style="color: var(--text-muted);">{{ $especialidad->description ?? 'Sin descripción' }}</td>
+                            <td>
+                                <a href="{{ route('especialidades.edit', $especialidad) }}" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.85rem;">Editar</a>
+                                <form action="{{ route('especialidades.destroy', $especialidad) }}" method="POST" style="display:inline;" onsubmit="return confirm('¿Estás seguro de eliminar esta especialidad?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.85rem;">Eliminar</button>
+                                </form>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>

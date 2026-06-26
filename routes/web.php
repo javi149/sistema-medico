@@ -13,9 +13,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     $specialties = \App\Models\Specialty::limit(8)->get();
     
-    // Obtenemos todos los médicos (que tienen perfil profesional)
+    // Obtenemos 12 médicos aleatorios para no sobrecargar la página (80 son muchos)
     $doctors = \App\Models\User::has('professionalProfile')
         ->with('professionalProfile.specialties')
+        ->inRandomOrder()
+        ->limit(12)
         ->get();
     
     return view('welcome', compact('specialties', 'doctors'));
