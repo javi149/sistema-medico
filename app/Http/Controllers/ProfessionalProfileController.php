@@ -61,7 +61,7 @@ class ProfessionalProfileController extends Controller
      */
     public function show(string $id)
     {
-        //
+        return redirect()->route('perfiles.index');
     }
 
     /**
@@ -69,7 +69,10 @@ class ProfessionalProfileController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $perfil = ProfessionalProfile::with('specialties')->findOrFail($id);
+        $especialidades = Specialty::all();
+
+        return view('perfiles.edit', compact('perfil', 'especialidades'));
     }
 
     /**
@@ -77,7 +80,23 @@ class ProfessionalProfileController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validatedData = $request->validate([
+            'bio' => 'nullable|max:1000',
+            'consultation_duration_minutes' => 'required|integer|min:15|max:60',
+            'specialties' => 'required|array|min:1',
+            'specialties.*' => 'exists:specialties,id',
+        ]);
+
+        $perfil = ProfessionalProfile::findOrFail($id);
+
+        $perfil->update([
+            'bio' => $validatedData['bio'] ?? null,
+            'consultation_duration_minutes' => $validatedData['consultation_duration_minutes'],
+        ]);
+
+        $perfil->specialties()->sync($validatedData['specialties']);
+
+        return redirect()->route('perfiles.index')->with('success', 'Perfil profesional actualizado con éxito.');
     }
 
     /**
@@ -85,6 +104,11 @@ class ProfessionalProfileController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $perfil = ProfessionalProfile::findOrFail($id);
+
+        $perfil->specialties()->detach();
+        $perfil->delete();
+
+        return redirect()->route('perfiles.index')->with('success', 'Perfil profesional eliminado con éxito.');
     }
 }

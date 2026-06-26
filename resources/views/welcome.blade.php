@@ -398,7 +398,7 @@
 
         <div class="bento-card hero-image-card">
             <!-- Imagen generada dinámicamente -->
-            <img src="{{ asset('images/hero_doctors.png') }}" alt="Equipo médico">
+            <img src="{{ asset('images/hero_doctors.png') }}" alt="Equipo médico" loading="lazy">
             
             <div style="position: absolute; bottom: 20px; right: 20px; background: white; padding: 10px 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 10px; font-weight: 700;">
                 <span style="color: #ef4444;">📍</span> 4.8 
@@ -502,7 +502,7 @@
                     @endphp
                     <div class="doctor-card doctor-item" data-specialty="{{ $docSpecId }}">
                         <div class="doctor-avatar">
-                            <img src="{{ $photoUrl }}" alt="Doctor" style="object-fit: cover;">
+                            <img src="{{ $photoUrl }}" alt="Doctor" style="object-fit: cover;" loading="lazy">
                         </div>
                         <div class="doctor-spec">
                             @if($doctor->professionalProfile && $doctor->professionalProfile->specialties->count() > 0)

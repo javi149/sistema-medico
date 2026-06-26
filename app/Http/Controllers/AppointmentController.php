@@ -214,9 +214,11 @@ class AppointmentController extends Controller
         $appointment = Appointment::findOrFail($id);
 
         // 2. Cambiar el estado a Cancelada
-        $appointment->status = 'Cancelada';
+        $appointment->status = 'cancelada';
         $appointment->save();
 
+        // 3. Enviar correo de notificación
+        \Illuminate\Support\Facades\Mail::to($appointment->patient->email)->send(new \App\Mail\AppointmentNotification($appointment, 'Cancelada'));
         // 3. Obtener el correo del usuario asociado a la cita
         $userEmail = $appointment->patient->email;
 
@@ -235,6 +237,11 @@ class AppointmentController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'start_datetime' => 'sometimes|date|after:now',
+            'specialty_id' => 'sometimes|exists:specialties,id',
+        ]);
+
         $appointment = Appointment::findOrFail($id);
         
         // Actualizar los campos que vengan en la petición (fecha, hora de inicio, hora de término)
@@ -243,6 +250,8 @@ class AppointmentController extends Controller
         $appointment->status = 'Modificada';
         $appointment->save();
 
+        // Enviar correo de notificación de modificación
+        \Illuminate\Support\Facades\Mail::to($appointment->patient->email)->send(new \App\Mail\AppointmentNotification($appointment, 'Modificada'));
         $userEmail = $appointment->patient->email;
 
         // Enviar notificación de modificación

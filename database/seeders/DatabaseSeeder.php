@@ -249,7 +249,7 @@ class DatabaseSeeder extends Seeder
             ['Tabla', 'Registros'],
             [
                 ['users (admin)', '1'],
-                ['users (médicos)', count($medicosData)],
+                ['users (médicos)', count($perfiles)],
                 ['users (pacientes)', $pacientes->count()],
                 ['specialties', $specialties->count()],
                 ['professional_profiles', count($perfiles)],
