@@ -34,34 +34,44 @@ class AppointmentController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * 
+     * [LÓGICA DE NEGOCIO PROFUNDA - INGENIERÍA DE SOFTWARE]
+     * Este método implementa el caso de uso central del sistema: Agendamiento de Citas.
+     * Se aplican principios ACID y control de concurrencia para mantener la consistencia de datos.
      */
     public function store(Request $request)
     {
-        // 1. Validación inicial: Aseguramos que los datos sean correctos y coherentes
+        // 1. VALIDACIÓN (Capa de Seguridad y Reglas de Negocio Básicas)
+        // Se valida integridad referencial (exists) y reglas temporales (after:now)
         $request->validate([
             'patient_id' => 'required|exists:users,id',
             'professional_profile_id' => 'required|exists:professional_profiles,id',
-            'start_datetime' => 'required|date|after:now', // Regla de negocio: No agendar en el pasado
+            'start_datetime' => 'required|date|after:now', // Regla: No agendar en el pasado
         ]);
 
         try {
-            // 2. Iniciamos la Transacción de Base de Datos
+            // 2. TRANSACCIÓN DE BASE DE DATOS (Atomicidad)
+            // Asegura que todas las operaciones dentro del closure se ejecuten con éxito (Commit)
+            // o ninguna lo haga (Rollback), previniendo inconsistencias estructurales.
             $appointment = DB::transaction(function () use ($request) {
                 
-                // Buscamos si ya existe una cita en esa misma fecha/hora para ese médico específico.
-                // lockForUpdate() bloquea las filas que coincidan para que nadie más las lea mientras guardamos.
+                // 3. CONTROL DE CONCURRENCIA (Bloqueo Pesimista)
+                // lockForUpdate() aplica un "FOR UPDATE" a nivel de SQL. Si dos pacientes intentan
+                // reservar el mismo bloque simultáneamente (condición de carrera), el motor
+                // de BD pondrá en cola la segunda petición hasta que la primera libere el bloqueo.
                 $conflicto = Appointment::where('professional_profile_id', $request->professional_profile_id)
                     ->where('start_datetime', $request->start_datetime)
-                    ->whereIn('status', ['reservada', 'confirmada', 'Modificada', 'modificada']) // Si está cancelada, no es conflicto
+                    ->whereIn('status', ['reservada', 'confirmada', 'Modificada', 'modificada']) // Excluye canceladas
                     ->lockForUpdate()
                     ->first();
 
                 if ($conflicto) {
-                    // Si existe un conflicto, rompemos la transacción lanzando una Excepción
+                    // Rompemos la transacción lanzando una excepción si el bloque ya fue tomado
                     throw new \Exception('Lo sentimos, este bloque horario acaba de ser reservado por otro paciente.');
                 }
 
-                // 3. Obtenemos la especialidad principal del médico para adjuntarla a la cita
+                // 4. INTEGRIDAD REFERENCIAL COMPLEJA
+                // Obtenemos la especialidad del médico para asegurar consistencia en reportes futuros
                 $perfil = ProfessionalProfile::with('specialties')->findOrFail($request->professional_profile_id);
                 
                 // Validamos que el médico tenga al menos una especialidad asignada
