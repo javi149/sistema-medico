@@ -87,6 +87,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::patch('/admin/appointments/{appointment}', [AppointmentController::class, 'adminUpdate'])->name('admin.appointments.update');
     Route::delete('/admin/appointments/{appointment}', [AppointmentController::class, 'adminDestroy'])->name('admin.appointments.destroy');
 
+    // Gestión de Lista de Espera por el Administrador
+    Route::get('/admin/waitlist', [\App\Http\Controllers\AdminWaitlistController::class, 'index'])->name('admin.waitlist.index');
+    Route::post('/admin/waitlist/{waitlist}/approve', [\App\Http\Controllers\AdminWaitlistController::class, 'approve'])->name('admin.waitlist.approve');
+
 });
 
 // ==========================================================
