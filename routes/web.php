@@ -97,6 +97,7 @@ Route::post('/citas', [AppointmentController::class, 'store'])->name('citas.stor
 Route::get('/citas/{cita}/success', [AppointmentController::class, 'success'])->name('citas.success');
 Route::post('/citas/wizard/check-rut', [AppointmentController::class, 'checkRut'])->name('wizard.check-rut');
 Route::get('/citas/wizard/availability', [AppointmentController::class, 'getAvailability'])->name('wizard.availability');
+Route::post('/waitlist', [\App\Http\Controllers\WaitlistController::class, 'store'])->name('waitlist.store');
 
 // ==========================================================
 // 3. RUTAS DEL PACIENTE
