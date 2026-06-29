@@ -9,7 +9,19 @@ class ReportController extends Controller
 {
     public function index()
     {
+        /*
+         * [LÓGICA DE NEGOCIO PROFUNDA - INGENIERÍA DE SOFTWARE]
+         * Este controlador genera los reportes gerenciales críticos para la toma de decisiones.
+         * Se optó por usar DB::select() con SQL puro (Raw SQL) en lugar de Eloquent ORM porque 
+         * las funciones de agregación complejas (COUNT DISTINCT, condicionales CASE WHEN, 
+         * cálculos matemáticos en la proyección) son mucho más eficientes procesadas directamente 
+         * por el motor de base de datos (PostgreSQL) que cargando colecciones masivas en la memoria de PHP.
+         */
+
         // Módulo 8: Ocupación y Disponibilidad Médica
+        // Lógica de Negocio: Mide la eficiencia de uso del tiempo de cada médico. 
+        // Formula: (Citas agendadas / Bloques disponibles) * 100
+        // Prevención de errores: Se usa CASE WHEN para evitar división por cero si un médico no tiene bloques.
         $modulo8 = DB::select("
             SELECT 
                 u.name AS medico_nombre,
@@ -29,6 +41,8 @@ class ReportController extends Controller
         ");
 
         // Módulo 9: Tasa de Cancelación y Deserción
+        // Lógica de Negocio: Identifica médicos con altos índices de pérdida de pacientes.
+        // Se cuenta el total de citas y se suman aquellas cuyo estado contiene la palabra 'cancelada'.
         $modulo9 = DB::select("
             SELECT 
                 u.name AS medico_nombre,
@@ -51,6 +65,8 @@ class ReportController extends Controller
         ");
 
         // Módulo 10: Nivel de Demanda en Listas de Espera
+        // Lógica de Negocio: Ayuda a la gerencia a decidir si necesitan contratar más médicos de cierta especialidad.
+        // Cuantifica cuántos pacientes están en lista de espera por cada especialidad.
         $modulo10 = DB::select("
             SELECT 
                 s.name AS especialidad,

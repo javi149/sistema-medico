@@ -105,6 +105,13 @@
     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
         <span class="badge badge-warning">TASA DE CANCELACIÓN</span>
         <h3 style="margin: 0; font-size: 1.25rem; font-weight: 700; color: var(--text-main);">Tasa de Cancelación y Deserción</h3>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+    <!-- Grafico Ocupacion -->
+    <div class="card">
+        <h3 style="margin-top: 0; margin-bottom: 20px; color: var(--text-main);">Ocupación por Médico</h3>
+        <div style="max-height: 350px; overflow-y: auto; overflow-x: hidden; padding-right: 5px;">
+            <div id="chart-ocupacion" style="min-height: 300px;"></div>
+        </div>
     </div>
 
     <div class="card" style="padding: 0; overflow: hidden;">
@@ -237,6 +244,22 @@ document.addEventListener('DOMContentLoaded', function () {
         new ApexCharts(document.querySelector('#chart-ocupacion'), {
             series: [{ name: 'Ocupación (%)', data: datosOcupacion.map(Number) }],
             chart: { type: 'bar', height: 320, toolbar: { show: false }, ...chartTheme },
+    document.addEventListener("DOMContentLoaded", function() {
+        // Datos Módulo 8
+        const nombresOcupacion = {!! json_encode(collect($modulo8)->pluck('medico_nombre')) !!};
+        const datosOcupacion = {!! json_encode(collect($modulo8)->pluck('porcentaje_ocupacion')) !!};
+
+        const optionsOcupacion = {
+            series: [{
+                name: 'Ocupación (%)',
+                data: datosOcupacion
+            }],
+            chart: {
+                type: 'bar',
+                height: Math.max(300, nombresOcupacion.length * 25), // Altura dinámica: 25px por cada médico, mínimo 300px
+                toolbar: { show: false },
+                fontFamily: 'inherit'
+            },
             plotOptions: {
                 bar: { borderRadius: 6, horizontal: true, barHeight: '60%' }
             },

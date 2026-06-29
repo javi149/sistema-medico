@@ -10,7 +10,7 @@
 
         <div class="mt-4">
             <x-input-label for="rut" :value="__('RUT')" />
-            <x-text-input id="rut" class="block mt-1 w-full" type="text" name="rut" :value="old('rut')" required autocomplete="rut" />
+            <x-text-input id="rut" class="block mt-1 w-full" type="text" name="rut" :value="old('rut')" required autocomplete="rut" maxlength="12" />
             <x-input-error :messages="$errors->get('rut')" class="mt-2" />
         </div>
 

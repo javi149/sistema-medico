@@ -11,6 +11,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Agregamos el formateador de RUT para que se ejecute en todas las peticiones web
+        $middleware->web(append: [
+            \App\Http\Middleware\FormatRut::class,
+        ]);
+
         // Registramos los alias de Spatie para poder usarlos en routes/web.php
         $middleware->alias([
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,

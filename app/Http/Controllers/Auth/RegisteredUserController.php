@@ -33,7 +33,7 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'rut' => ['required', 'string', 'max:255', 'unique:'.User::class], // Validación del RUT
+            'rut' => ['required', 'string', 'max:12', new \App\Rules\ValidRut, 'unique:'.User::class], // Validación del RUT
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
