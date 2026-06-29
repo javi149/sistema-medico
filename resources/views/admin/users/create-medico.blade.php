@@ -31,7 +31,7 @@
 
             <div class="form-group">
                 <label class="form-label">RUT</label>
-                <input type="text" name="rut" class="form-control @error('rut') is-invalid @enderror" value="{{ old('rut') }}" required placeholder="Ej: 12345678-9">
+                <input type="text" name="rut" class="form-control @error('rut') is-invalid @enderror" value="{{ old('rut') }}" required placeholder="Ej: 12345678-9" maxlength="12">
                 @error('rut')<span style="color: red; font-size: 0.85rem;">{{ $message }}</span>@enderror
             </div>
 

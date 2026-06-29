@@ -21,7 +21,7 @@
 
             <div class="form-group">
                 <label class="form-label">RUT</label>
-                <input type="text" name="rut" class="form-control" value="{{ old('rut', $paciente->rut) }}" required placeholder="12345678-9">
+                <input type="text" name="rut" class="form-control" value="{{ old('rut', $paciente->rut) }}" required placeholder="12345678-9" maxlength="12">
             </div>
 
             <div class="form-group">
