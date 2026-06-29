@@ -30,9 +30,11 @@ class AppointmentController extends Controller
      */
     public function create()
     {
-    $perfiles = ProfessionalProfile::with(['user', 'specialties'])->get(); // ← línea 33
+        // Traemos todos los perfiles profesionales, junto con los datos de su usuario (nombre) 
+        // y sus especialidades para mostrarlos en el menú desplegable.
+        $perfiles = ProfessionalProfile::with(['user', 'specialties'])->get();
 
-    return view('citas.create', compact('perfiles')); // ← línea 35
+        return view('citas.create', compact('perfiles'));
     }
 
     /**

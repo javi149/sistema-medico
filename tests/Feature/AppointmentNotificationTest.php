@@ -49,14 +49,21 @@ class AppointmentNotificationTest extends TestCase
     {
         Mail::fake();
 
+        // Crear una especialidad para la prueba
+        $specialtyId = DB::table('specialties')->insertGetId([
+            'name' => 'Cardiología',
+            'description' => 'Especialidad en el corazón',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
         // Crear una cita médica
         $appointment = Appointment::create([
             'patient_id' => $this->patient->id,
             'professional_profile_id' => $this->profileId,
-            'date' => '2026-06-20',
-            'start_time' => '10:00:00',
-            'end_time' => '10:30:00',
-            'status' => 'Agendada',
+            'specialty_id' => $specialtyId,
+            'start_datetime' => '2026-06-20 10:00:00',
+            'status' => 'reservada',
         ]);
 
         // Realizar petición como paciente autenticado
@@ -70,14 +77,14 @@ class AppointmentNotificationTest extends TestCase
         // Verificar cambio en base de datos
         $this->assertDatabaseHas('appointments', [
             'id' => $appointment->id,
-            'status' => 'Cancelada',
+            'status' => 'cancelada',
         ]);
 
         // Verificar envío de correo por Mailtrap/Mail
         Mail::assertSent(AppointmentNotification::class, function (AppointmentNotification $mail) {
             return $mail->hasTo('paciente@example.com') &&
                    $mail->actionType === 'Cancelada' &&
-                   $mail->appointment->status === 'Cancelada';
+                   $mail->appointment->status === 'cancelada';
         });
     }
 
@@ -88,21 +95,26 @@ class AppointmentNotificationTest extends TestCase
     {
         Mail::fake();
 
+        // Crear una especialidad para la prueba
+        $specialtyId = DB::table('specialties')->insertGetId([
+            'name' => 'Cardiología',
+            'description' => 'Especialidad en el corazón',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
         // Crear una cita médica
         $appointment = Appointment::create([
             'patient_id' => $this->patient->id,
             'professional_profile_id' => $this->profileId,
-            'date' => '2026-06-20',
-            'start_time' => '10:00:00',
-            'end_time' => '10:30:00',
-            'status' => 'Agendada',
+            'specialty_id' => $specialtyId,
+            'start_datetime' => '2026-06-20 10:00:00',
+            'status' => 'reservada',
         ]);
 
         // Nuevos datos para la cita
         $newDetails = [
-            'date' => '2026-06-25',
-            'start_time' => '11:00:00',
-            'end_time' => '11:30:00',
+            'start_datetime' => '2026-06-25 11:00:00',
         ];
 
         // Realizar petición como paciente autenticado
@@ -116,19 +128,16 @@ class AppointmentNotificationTest extends TestCase
         // Verificar cambios en base de datos
         $this->assertDatabaseHas('appointments', [
             'id' => $appointment->id,
-            'date' => '2026-06-25',
-            'start_time' => '11:00:00',
-            'end_time' => '11:30:00',
-            'status' => 'Modificada',
+            'start_datetime' => '2026-06-25 11:00:00',
+            'status' => 'modificada',
         ]);
 
         // Verificar envío de correo por Mailtrap/Mail
         Mail::assertSent(AppointmentNotification::class, function (AppointmentNotification $mail) {
             return $mail->hasTo('paciente@example.com') &&
                    $mail->actionType === 'Modificada' &&
-                   $mail->appointment->status === 'Modificada' &&
-                   $mail->appointment->date === '2026-06-25' &&
-                   $mail->appointment->start_time === '11:00:00';
+                   $mail->appointment->status === 'modificada' &&
+                   $mail->appointment->start_datetime === '2026-06-25 11:00:00';
         });
     }
 }
