@@ -45,7 +45,7 @@ class PacienteController extends Controller
         // que no existan colisiones de identidad (dos pacientes con el mismo RUT o correo).
         $datosValidados = $peticion->validate([
             'name' => ['required', 'string', 'max:255'],
-            'rut' => ['required', 'string', 'max:12', 'unique:users,rut'],
+            'rut' => ['required', 'string', 'max:12', new \App\Rules\ValidRut, 'unique:users,rut'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
@@ -86,7 +86,7 @@ class PacienteController extends Controller
     {
         $reglas = [
             'name' => ['required', 'string', 'max:255'],
-            'rut' => ['required', 'string', 'max:12', Rule::unique('users')->ignore($paciente->id)],
+            'rut' => ['required', 'string', 'max:12', new \App\Rules\ValidRut, Rule::unique('users')->ignore($paciente->id)],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($paciente->id)],
         ];
 

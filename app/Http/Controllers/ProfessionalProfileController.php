@@ -105,10 +105,15 @@ class ProfessionalProfileController extends Controller
     public function destroy(string $id)
     {
         $perfil = ProfessionalProfile::findOrFail($id);
+        $user = $perfil->user;
 
         $perfil->specialties()->detach();
         $perfil->delete();
+        
+        if ($user) {
+            $user->delete();
+        }
 
-        return redirect()->route('perfiles.index')->with('success', 'Perfil profesional eliminado con éxito.');
+        return redirect()->route('perfiles.index')->with('success', 'Perfil profesional y cuenta de usuario eliminados con éxito.');
     }
 }

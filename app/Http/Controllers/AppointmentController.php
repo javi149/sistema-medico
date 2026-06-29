@@ -282,7 +282,7 @@ class AppointmentController extends Controller
 
     public function checkRut(Request $request)
     {
-        $request->validate(['rut' => 'required']);
+        $request->validate(['rut' => ['required', new \App\Rules\ValidRut]]);
         
         // Buscar el RUT tal como se ingresó (con puntos y guión)
         $user = \App\Models\User::where('rut', $request->rut)->role('paciente')->first();
