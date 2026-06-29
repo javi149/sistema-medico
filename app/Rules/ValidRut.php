@@ -19,33 +19,15 @@ class ValidRut implements ValidationRule
         $rut = preg_replace('/[^0-9kK]/', '', (string)$value);
 
         if (strlen($rut) < 2) {
-            $fail('El RUT ingresado no es válido.');
+            $fail('El RUT ingresado es demasiado corto.');
+            return;
+        }
+        
+        if (strlen($rut) > 9) {
+            $fail('El RUT no puede tener más de 9 dígitos (sin contar puntos ni guión).');
             return;
         }
 
-        // 2. Extraer cuerpo y dígito verificador
-        $cuerpo = substr($rut, 0, -1);
-        $dv = strtoupper(substr($rut, -1));
-
-        // 3. Algoritmo Módulo 11
-        $suma = 0;
-        $multiplo = 2;
-
-        for ($i = 1; $i <= strlen($cuerpo); $i++) {
-            $index = $multiplo * $rut[strlen($cuerpo) - $i];
-            $suma += $index;
-            if ($multiplo < 7) {
-                $multiplo += 1;
-            } else {
-                $multiplo = 2;
-            }
-        }
-
-        $dvEsperado = 11 - ($suma % 11);
-        $dvEsperado = ($dvEsperado == 11) ? '0' : (($dvEsperado == 10) ? 'K' : (string)$dvEsperado);
-
-        if ($dv !== $dvEsperado) {
-            $fail('El RUT ingresado no es válido matemáticamente.');
-        }
+        // Permitir RUTs falsos para pruebas académicas
     }
 }
