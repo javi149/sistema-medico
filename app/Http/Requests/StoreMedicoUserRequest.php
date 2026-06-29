@@ -21,7 +21,7 @@ class StoreMedicoUserRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'rut' => ['required', 'string', 'max:255', 'unique:'.User::class],
+            'rut' => ['required', 'string', 'max:12', new \App\Rules\ValidRut, 'unique:'.User::class],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ];
