@@ -8,9 +8,7 @@ use App\Http\Controllers\ProfessionalProfileController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\PacienteController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\DoctorDashboardController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 
@@ -53,29 +51,37 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Rutas de Agendamiento de Citas (Notificación Email)
+    Route::post('/appointments/{id}/cancel', [AppointmentController::class, 'cancel'])->name('appointments.cancel');
+    Route::patch('/appointments/{id}', [AppointmentController::class, 'update'])->name('appointments.update');
 });
 
 require __DIR__.'/auth.php';
 
 // ==========================================================
-// 2. RUTAS DEL ADMINISTRADOR
+// 2. UNIFICAMOS TODAS LAS RUTAS DEL ADMINISTRADOR AQUÍ
 // ==========================================================
 Route::middleware(['auth', 'role:admin'])->group(function () {
-
+    
+    // Panel de control diario (Dashboard)
     Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
     Route::get('/admin/usuarios/medico/crear', [AdminUserController::class, 'createMedico'])->name('admin.users.create-medico');
     Route::post('/admin/usuarios/medico', [AdminUserController::class, 'storeMedico'])->name('admin.users.store-medico');
-
+    
+    // CRUD de Especialidades Médicas
     Route::resource('especialidades', SpecialtyController::class);
+    
+    // CRUD de Perfiles Médicos
     Route::resource('perfiles', ProfessionalProfileController::class);
+
+    // CRUD de Pacientes
     Route::resource('pacientes', PacienteController::class);
 
+    // Reportes de Gestión (Tu módulo)
     Route::get('/admin/reportes', [ReportController::class, 'index'])->name('reportes.index');
 
-    // Rutas de gestión de citas desde panel admin (con notificación por email)
-    Route::post('/appointments/{id}/cancel', [AppointmentController::class, 'cancel'])->name('appointments.cancel');
-    Route::patch('/appointments/{id}', [AppointmentController::class, 'update'])->name('appointments.update');
     // Gestión de Citas Médicas por el Administrador
     Route::get('/admin/appointments/create', [AppointmentController::class, 'adminCreate'])->name('admin.appointments.create');
     Route::post('/admin/appointments', [AppointmentController::class, 'adminStore'])->name('admin.appointments.store');
@@ -103,9 +109,10 @@ Route::post('/waitlist', [\App\Http\Controllers\WaitlistController::class, 'stor
 // 3. RUTAS DEL PACIENTE
 // ==========================================================
 Route::middleware(['auth', 'role:paciente'])->group(function () {
-
+    
     Route::get('/citas', [AppointmentController::class, 'index'])->name('citas.index');
-
+    
+    // LA NUEVA RUTA PARA CANCELAR
     Route::patch('/citas/{cita}/cancelar', [AppointmentController::class, 'cancelar'])->name('citas.cancelar');
 
     // RUTAS PARA MODIFICAR
@@ -117,11 +124,12 @@ Route::middleware(['auth', 'role:paciente'])->group(function () {
     Route::post('/waitlist/{waitlist}/decline', [\App\Http\Controllers\WaitlistController::class, 'decline'])->name('waitlist.decline');
 
 });
-
 // ==========================================================
 // 4. RUTAS DEL MÉDICO
 // ==========================================================
 Route::middleware(['auth', 'role:medico'])->group(function () {
+    
+    // Panel de control diario del Doctor
+    Route::get('/medico/dashboard', [App\Http\Controllers\DoctorDashboardController::class, 'index'])->name('medico.dashboard');
 
-    Route::get('/medico/dashboard', [DoctorDashboardController::class, 'index'])->name('medico.dashboard');
 });

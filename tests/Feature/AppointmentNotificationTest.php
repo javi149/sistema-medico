@@ -14,10 +14,9 @@ class AppointmentNotificationTest extends TestCase
 {
     use RefreshDatabase;
 
-    private User $patient;
-    private User $doctor;
-    private User $admin;
-    private int $profileId;
+    private $patient;
+    private $doctor;
+    private $profileId;
 
     protected function setUp(): void
     {
@@ -37,14 +36,8 @@ class AppointmentNotificationTest extends TestCase
             'email' => 'medico@example.com',
         ]);
         $this->doctor->assignRole('medico');
-        
-        // 3. Crear usuario admin
-        $this->admin = User::factory()->create([
-            'email' => 'admin@example.com',
-        ]);
-        $this->admin->assignRole('admin');
 
-        // 4. Crear perfil profesional para el médico
+        // 3. Crear perfil profesional para el médico
         $this->profileId = DB::table('professional_profiles')->insertGetId([
             'user_id' => $this->doctor->id,
             'box_number' => 'Box 101',
@@ -61,39 +54,37 @@ class AppointmentNotificationTest extends TestCase
     {
         Mail::fake();
 
-        // Crear una especialidad para la prueba
-        $specialtyId = DB::table('specialties')->insertGetId([
-            'name' => 'Cardiología',
-            'description' => 'Especialidad en el corazón',
-        ]);
+        // Crear una especialidad para asociarla a la cita
+        $specialty = \App\Models\Specialty::create(['name' => 'Pediatría']);
 
+        // Crear una cita médica
         $appointment = Appointment::create([
             'patient_id' => $this->patient->id,
             'professional_profile_id' => $this->profileId,
-            'specialty_id' => $specialtyId,
-            'start_datetime' => '2026-06-20 10:00:00',
-            'status' => 'reservada',
+            'specialty_id' => $specialty->id,
+            'start_datetime' => now()->addDays(2)->format('Y-m-d H:i:s'),
+            'status' => 'Agendada',
         ]);
 
-        // Realizar petición como admin autenticado
-        $response = $this->actingAs($this->admin)
-            ->from('/admin/dashboard') // Usar dashboard como origen para el redirect back
+        // Realizar petición como paciente autenticado
+        $response = $this->actingAs($this->patient)
+            ->from('/dashboard') // Usar dashboard como origen para el redirect back
             ->post("/appointments/{$appointment->id}/cancel");
 
-        $response->assertRedirect('/admin/dashboard');
+        $response->assertRedirect('/dashboard');
         $response->assertSessionHas('success', 'Cita cancelada con éxito y notificación enviada.');
 
         // Verificar cambio en base de datos
         $this->assertDatabaseHas('appointments', [
             'id' => $appointment->id,
-            'status' => 'cancelada',
+            'status' => 'Cancelada',
         ]);
 
         // Verificar envío de correo por Mailtrap/Mail
         Mail::assertSent(AppointmentNotification::class, function (AppointmentNotification $mail) {
             return $mail->hasTo('paciente@example.com') &&
                    $mail->actionType === 'Cancelada' &&
-                   $mail->appointment->status === 'cancelada';
+                   $mail->appointment->status === 'Cancelada';
         });
     }
 
@@ -104,13 +95,6 @@ class AppointmentNotificationTest extends TestCase
     {
         Mail::fake();
 
-        // Crear una especialidad para la prueba
-        $specialtyId = DB::table('specialties')->insertGetId([
-            'name' => 'Cardiología',
-            'description' => 'Especialidad en el corazón',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
         // Crear una especialidad para asociarla a la cita
         $specialty = \App\Models\Specialty::create(['name' => 'Pediatría']);
 
@@ -118,9 +102,6 @@ class AppointmentNotificationTest extends TestCase
         $appointment = Appointment::create([
             'patient_id' => $this->patient->id,
             'professional_profile_id' => $this->profileId,
-            'specialty_id' => $specialtyId,
-            'start_datetime' => '2026-06-20 10:00:00',
-            'status' => 'reservada',
             'specialty_id' => $specialty->id,
             'start_datetime' => now()->addDays(2)->format('Y-m-d H:i:s'),
             'status' => 'Agendada',
@@ -131,12 +112,12 @@ class AppointmentNotificationTest extends TestCase
             'start_datetime' => now()->addDays(5)->format('Y-m-d H:i:s'),
         ];
 
-        // Realizar petición como admin autenticado
-        $response = $this->actingAs($this->admin)
-            ->from('/admin/dashboard')
+        // Realizar petición como paciente autenticado
+        $response = $this->actingAs($this->patient)
+            ->from('/dashboard')
             ->patch("/appointments/{$appointment->id}", $newDetails);
 
-        $response->assertRedirect('/admin/dashboard');
+        $response->assertRedirect('/dashboard');
         $response->assertSessionHas('success', 'Cita modificada con éxito y notificación enviada.');
 
         // Verificar cambios en base de datos
@@ -151,7 +132,7 @@ class AppointmentNotificationTest extends TestCase
             return $mail->hasTo('paciente@example.com') &&
                    $mail->actionType === 'Modificada' &&
                    $mail->appointment->status === 'Modificada' &&
-                   $mail->appointment->start_datetime->format('Y-m-d H:i:s') === $newDetails['start_datetime'];
+                   $mail->appointment->start_datetime === $newDetails['start_datetime'];
         });
     }
 
