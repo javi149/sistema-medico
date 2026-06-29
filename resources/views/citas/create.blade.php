@@ -274,6 +274,14 @@
                     <input type="hidden" name="start_datetime" x-model="selectedDatetime">
                 </form>
 
+                <!-- Formulario Oculto para Lista de Espera -->
+                <form id="waitlistForm" action="{{ route('waitlist.store') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="patient_id" x-model="patientId">
+                    <input type="hidden" name="specialty_id" x-model="specialtyId">
+                    <input type="hidden" name="professional_profile_id" x-model="selectedDoctorId">
+                </form>
+
                 <!-- STEP 1: RUT -->
                 <div x-show="step === 1" x-transition>
                     <h3 style="color: #0f766e; text-align: center; margin-bottom: 5px;">¿PARA QUIÉN ES LA HORA?</h3>
@@ -342,8 +350,15 @@
                     <!-- Doctors and Slots -->
                     <div x-show="!loadingAvailability" class="doctor-list">
                         
-                        <div x-show="availableDoctors.length === 0" style="text-align: center; padding: 40px; color: #64748b; background: #f8fafc; border-radius: 8px;">
-                            No hay horas disponibles para esta fecha. Intenta con otro día.
+                        <div x-show="availableDoctors.length === 0 || !hasAvailableSlots()" style="text-align: center; padding: 40px; color: #64748b; background: #f8fafc; border-radius: 8px;">
+                            <p style="margin: 0 0 15px 0;">No hay horas disponibles para esta fecha. Intenta con otro día.</p>
+                            <div style="margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
+                                <h4 style="color: #0f766e; margin: 0 0 10px 0; font-size: 1.1rem;">¿Deseas inscribirte en la lista de espera?</h4>
+                                <p style="font-size: 0.9rem; color: #64748b; margin: 0 0 15px 0;">Te notificaremos automáticamente por correo electrónico en cuanto se libere un cupo.</p>
+                                <button type="button" class="btn-primary" style="display: inline-block; padding: 10px 24px; border-radius: 50px; font-weight: 600; cursor: pointer; border: none;" @click="joinWaitlist()">
+                                    Inscribirse en Lista de Espera
+                                </button>
+                            </div>
                         </div>
 
                         <template x-for="(doc, index) in availableDoctors" :key="index">
@@ -505,6 +520,20 @@
                     this.selectedDoctorId = null;
                     this.selectedDatetime = null;
                     this.fetchAvailability();
+                },
+
+                hasAvailableSlots() {
+                    return this.availableDoctors.some(doc => doc.slots && doc.slots.some(slot => slot.available));
+                },
+
+                joinWaitlist() {
+                    if (!this.patientId || !this.specialtyId) {
+                        alert('Por favor complete los pasos anteriores.');
+                        return;
+                    }
+                    this.$nextTick(() => {
+                        document.getElementById('waitlistForm').submit();
+                    });
                 },
 
                 fetchAvailability() {

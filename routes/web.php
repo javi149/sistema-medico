@@ -89,6 +89,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::patch('/admin/appointments/{appointment}', [AppointmentController::class, 'adminUpdate'])->name('admin.appointments.update');
     Route::delete('/admin/appointments/{appointment}', [AppointmentController::class, 'adminDestroy'])->name('admin.appointments.destroy');
 
+    // Gestión de Lista de Espera por el Administrador
+    Route::get('/admin/waitlist', [\App\Http\Controllers\AdminWaitlistController::class, 'index'])->name('admin.waitlist.index');
+    Route::post('/admin/waitlist/{waitlist}/approve', [\App\Http\Controllers\AdminWaitlistController::class, 'approve'])->name('admin.waitlist.approve');
+
 });
 
 // ==========================================================
@@ -99,6 +103,7 @@ Route::post('/citas', [AppointmentController::class, 'store'])->name('citas.stor
 Route::get('/citas/{cita}/success', [AppointmentController::class, 'success'])->name('citas.success');
 Route::post('/citas/wizard/check-rut', [AppointmentController::class, 'checkRut'])->name('wizard.check-rut');
 Route::get('/citas/wizard/availability', [AppointmentController::class, 'getAvailability'])->name('wizard.availability');
+Route::post('/waitlist', [\App\Http\Controllers\WaitlistController::class, 'store'])->name('waitlist.store');
 
 // ==========================================================
 // 3. RUTAS DEL PACIENTE
@@ -113,6 +118,10 @@ Route::middleware(['auth', 'role:paciente'])->group(function () {
     // RUTAS PARA MODIFICAR
     Route::get('/citas/{cita}/edit', [AppointmentController::class, 'edit'])->name('citas.edit');
     Route::patch('/citas/{cita}', [AppointmentController::class, 'updatePaciente'])->name('citas.update');
+
+    // RUTAS DE LISTA DE ESPERA (ACEPTAR / RECHAZAR)
+    Route::post('/waitlist/{waitlist}/accept', [\App\Http\Controllers\WaitlistController::class, 'accept'])->name('waitlist.accept');
+    Route::post('/waitlist/{waitlist}/decline', [\App\Http\Controllers\WaitlistController::class, 'decline'])->name('waitlist.decline');
 
 });
 // ==========================================================

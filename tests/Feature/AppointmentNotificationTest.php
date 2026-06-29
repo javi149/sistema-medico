@@ -62,7 +62,7 @@ class AppointmentNotificationTest extends TestCase
             'patient_id' => $this->patient->id,
             'professional_profile_id' => $this->profileId,
             'specialty_id' => $specialty->id,
-            'start_datetime' => '2026-06-20 10:00:00',
+            'start_datetime' => now()->addDays(2)->format('Y-m-d H:i:s'),
             'status' => 'Agendada',
         ]);
 
@@ -103,13 +103,13 @@ class AppointmentNotificationTest extends TestCase
             'patient_id' => $this->patient->id,
             'professional_profile_id' => $this->profileId,
             'specialty_id' => $specialty->id,
-            'start_datetime' => '2026-06-20 10:00:00',
+            'start_datetime' => now()->addDays(2)->format('Y-m-d H:i:s'),
             'status' => 'Agendada',
         ]);
 
         // Nuevos datos para la cita
         $newDetails = [
-            'start_datetime' => '2026-06-25 11:00:00',
+            'start_datetime' => now()->addDays(5)->format('Y-m-d H:i:s'),
         ];
 
         // Realizar petición como paciente autenticado
@@ -123,16 +123,16 @@ class AppointmentNotificationTest extends TestCase
         // Verificar cambios en base de datos
         $this->assertDatabaseHas('appointments', [
             'id' => $appointment->id,
-            'start_datetime' => '2026-06-25 11:00:00',
+            'start_datetime' => $newDetails['start_datetime'],
             'status' => 'Modificada',
         ]);
 
         // Verificar envío de correo por Mailtrap/Mail
-        Mail::assertSent(AppointmentNotification::class, function (AppointmentNotification $mail) {
+        Mail::assertSent(AppointmentNotification::class, function (AppointmentNotification $mail) use ($newDetails) {
             return $mail->hasTo('paciente@example.com') &&
                    $mail->actionType === 'Modificada' &&
                    $mail->appointment->status === 'Modificada' &&
-                   $mail->appointment->start_datetime === '2026-06-25 11:00:00';
+                   $mail->appointment->start_datetime === $newDetails['start_datetime'];
         });
     }
 
@@ -148,7 +148,7 @@ class AppointmentNotificationTest extends TestCase
             'patient_id' => $this->patient->id,
             'professional_profile_id' => $this->profileId,
             'specialty_id' => $specialty->id,
-            'start_datetime' => '2026-06-20 10:00:00',
+            'start_datetime' => now()->addDays(2)->format('Y-m-d H:i:s'),
             'status' => 'reservada',
         ]);
 
@@ -158,9 +158,10 @@ class AppointmentNotificationTest extends TestCase
         $responseEdit->assertStatus(200);
 
         // 2. Reprogramar la cita
+        $newTime = now()->addDays(5)->format('Y-m-d H:i:s');
         $responseUpdate = $this->actingAs($this->patient)
             ->patch("/citas/{$appointment->id}", [
-                'start_datetime' => '2026-06-25 15:30:00'
+                'start_datetime' => $newTime
             ]);
 
         $responseUpdate->assertRedirect('/citas');
@@ -168,7 +169,7 @@ class AppointmentNotificationTest extends TestCase
 
         $this->assertDatabaseHas('appointments', [
             'id' => $appointment->id,
-            'start_datetime' => '2026-06-25 15:30:00',
+            'start_datetime' => $newTime,
             'status' => 'Modificada',
         ]);
 
@@ -196,31 +197,33 @@ class AppointmentNotificationTest extends TestCase
         ]);
 
         // 1. Agendar cita por Admin
+        $date1 = now()->addDays(2)->format('Y-m-d') . ' 09:00:00';
         $responseStore = $this->actingAs($admin)
             ->post('/admin/appointments', [
                 'patient_id' => $this->patient->id,
                 'professional_profile_id' => $this->profileId,
-                'start_datetime' => '2026-06-22 09:00:00'
+                'start_datetime' => $date1
             ]);
 
-        $responseStore->assertRedirect('/admin/dashboard?date=2026-06-22');
+        $responseStore->assertRedirect('/admin/dashboard?date=' . now()->addDays(2)->format('Y-m-d'));
         
         $appointment = Appointment::where('patient_id', $this->patient->id)
-            ->where('start_datetime', '2026-06-22 09:00:00')
+            ->where('start_datetime', $date1)
             ->first();
         
         $this->assertNotNull($appointment);
 
         // 2. Reprogramar cita por Admin
+        $date2 = now()->addDays(2)->format('Y-m-d') . ' 11:30:00';
         $responseUpdate = $this->actingAs($admin)
             ->patch("/admin/appointments/{$appointment->id}", [
-                'start_datetime' => '2026-06-22 11:30:00'
+                'start_datetime' => $date2
             ]);
 
-        $responseUpdate->assertRedirect('/admin/dashboard?date=2026-06-22');
+        $responseUpdate->assertRedirect('/admin/dashboard?date=' . now()->addDays(2)->format('Y-m-d'));
         $this->assertDatabaseHas('appointments', [
             'id' => $appointment->id,
-            'start_datetime' => '2026-06-22 11:30:00',
+            'start_datetime' => $date2,
             'status' => 'Modificada',
         ]);
 
