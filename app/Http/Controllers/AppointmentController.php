@@ -22,7 +22,6 @@ class AppointmentController extends Controller
             ->orderBy('start_datetime', 'asc')
             ->get();
 
-        return view('citas.index', compact('misCitas'));
         // 1.1 Buscamos ofertas de lista de espera notificadas para el paciente.
         $waitlistOffers = \App\Models\Waitlist::with(['specialty', 'professionalProfile.user'])
             ->where('patient_id', Auth::id())
@@ -48,11 +47,7 @@ class AppointmentController extends Controller
     /**
      * Guardar una nueva cita con protección contra doble reserva.
      */
-    public function store(Request $request)
-    {
-        $specialties = \App\Models\Specialty::all();
-        return view('citas.create', compact('specialties'));
-    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -68,16 +63,6 @@ class AppointmentController extends Controller
         $request->validate([
             'patient_id' => 'required|exists:users,id',
             'professional_profile_id' => 'required|exists:professional_profiles,id',
-            'start_datetime'          => 'required|date|after:now',
-        ]);
-
-        try {
-            DB::transaction(function () use ($request) {
-
-                // Bloqueo pesimista para evitar doble reserva concurrente
-                $conflicto = Appointment::where('professional_profile_id', $request->professional_profile_id)
-                    ->where('start_datetime', $request->start_datetime)
-                    ->whereIn('status', ['reservada', 'confirmada'])
             'start_datetime' => 'required|date|after:now', // Regla: No agendar en el pasado
         ]);
 
@@ -98,9 +83,6 @@ class AppointmentController extends Controller
                     ->first();
 
                 if ($conflicto) {
-                    throw new \Exception('Lo sentimos, este bloque horario acaba de ser reservado por otro paciente.');
-                }
-
                     // Rompemos la transacción lanzando una excepción si el bloque ya fue tomado
                     throw new \Exception('Lo sentimos, este bloque horario acaba de ser reservado por otro paciente.');
                 }
@@ -112,9 +94,6 @@ class AppointmentController extends Controller
                 if ($perfil->specialties->isEmpty()) {
                     throw new \Exception('El médico seleccionado no tiene especialidades registradas.');
                 }
-
-                Appointment::create([
-                    'patient_id'              => Auth::id(),
                 
                 // 4. Guardamos la cita definitiva en la base de datos
                 $createdAppointment = Appointment::create([
@@ -128,9 +107,12 @@ class AppointmentController extends Controller
                 return $createdAppointment;
             });
 
-            return redirect()->back()->with('success', '¡Tu cita médica ha sido agendada con éxito!');
             // 5. Enviar el correo electrónico
-            \Illuminate\Support\Facades\Mail::to($appointment->patient->email)->send(new \App\Mail\AppointmentBooked($appointment));
+            try {
+                \Illuminate\Support\Facades\Mail::to($appointment->patient->email)->send(new \App\Mail\AppointmentBooked($appointment));
+            } catch (\Exception $e) {
+                // Ignorar error de email local
+            }
 
             // 6. Si la transacción termina con éxito, redirigimos a la pantalla de éxito
             return redirect()->route('citas.success', $appointment->id);
@@ -146,9 +128,7 @@ class AppointmentController extends Controller
     }
 
     /**
-     * Cancelar una cita (acción del paciente desde su portal).
-     * Solo puede cancelar sus propias citas y solo si están en estado "reservada".
-     */
+    /**
      * Display the specified resource.
      */
     public function show(string $id)
@@ -323,25 +303,8 @@ class AppointmentController extends Controller
         return redirect()->back()->with('success', 'Cita modificada con éxito y notificación enviada.');
     }
 
-    // ---------------------------------------------------------------
-    // Métodos del CRUD estándar (pendientes de implementar)
-    // ---------------------------------------------------------------
 
-    public function show(string $id)
-    {
-        //
-    }
 
-    public function edit(string $id)
-    {
-        //
-    }
-
-    public function destroy(string $id)
-    {
-        //
-    }
-}
     public function checkRut(Request $request)
     {
         $request->validate(['rut' => ['required', new \App\Rules\ValidRut]]);

@@ -34,4 +34,3 @@ class Appointment extends Model
         return $this->belongsTo(Specialty::class, 'specialty_id');
     }
 }
-}

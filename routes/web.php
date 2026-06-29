@@ -27,8 +27,6 @@ Route::get('/', function () {
     return view('welcome', compact('specialties', 'doctors'));
 });
 
-Route::get('/dashboard', function (Request $request) {
-    $user = $request->user();
 Route::get('/dashboard', function () {
     $user = Auth::user();
 
