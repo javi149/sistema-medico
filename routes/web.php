@@ -104,13 +104,8 @@ Route::post('/waitlist', [\App\Http\Controllers\WaitlistController::class, 'stor
 // ==========================================================
 Route::middleware(['auth', 'role:paciente'])->group(function () {
 
-    Route::resource('citas', AppointmentController::class)->only(['create', 'store', 'index']);
-
-    Route::patch('/citas/{cita}/cancelar', [AppointmentController::class, 'cancelar'])->name('citas.cancelar');
-    
     Route::get('/citas', [AppointmentController::class, 'index'])->name('citas.index');
-    
-    // LA NUEVA RUTA PARA CANCELAR
+
     Route::patch('/citas/{cita}/cancelar', [AppointmentController::class, 'cancelar'])->name('citas.cancelar');
 
     // RUTAS PARA MODIFICAR
