@@ -40,4 +40,90 @@ class WaitlistController extends Controller
 
         return redirect()->route('dashboard')->with('success', 'Te has inscrito exitosamente en la lista de espera. Te enviaremos un correo apenas se libere un cupo.');
     }
+
+    /**
+     * Accept the offered slot.
+     */
+    public function accept(Waitlist $waitlist)
+    {
+        if ($waitlist->patient_id !== Auth::id()) {
+            abort(403, 'No estás autorizado para realizar esta acción.');
+        }
+
+        if ($waitlist->status !== 'Notificado') {
+            return redirect()->back()->withErrors(['error' => 'Esta oferta no está activa o ya fue procesada.']);
+        }
+
+        try {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($waitlist) {
+                // Check if slot is still available (to prevent double booking)
+                $conflicto = \App\Models\Appointment::where('professional_profile_id', $waitlist->professional_profile_id)
+                    ->where('start_datetime', $waitlist->offered_datetime)
+                    ->whereIn('status', ['reservada', 'confirmada', 'Modificada', 'modificada'])
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($conflicto) {
+                    throw new \Exception('Lo sentimos, este bloque horario ya fue reservado por otro paciente.');
+                }
+
+                // Create the appointment
+                $appointment = \App\Models\Appointment::create([
+                    'patient_id' => $waitlist->patient_id,
+                    'professional_profile_id' => $waitlist->professional_profile_id,
+                    'specialty_id' => $waitlist->specialty_id,
+                    'start_datetime' => $waitlist->offered_datetime,
+                    'status' => 'reservada',
+                ]);
+
+                // Update waitlist status to Reasignado
+                $waitlist->update([
+                    'status' => 'Reasignado',
+                ]);
+
+                // Send confirmation email
+                try {
+                    \Illuminate\Support\Facades\Mail::to($waitlist->patient->email)->send(new \App\Mail\AppointmentBooked($appointment));
+                } catch (\Exception $e) {
+                    // Ignore
+                }
+            });
+
+            return redirect()->route('citas.index')->with('success', '¡Cupo aceptado con éxito! Tu cita médica ha sido agendada.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Decline the offered slot.
+     */
+    public function decline(Waitlist $waitlist)
+    {
+        if ($waitlist->patient_id !== Auth::id()) {
+            abort(403, 'No estás autorizado para realizar esta acción.');
+        }
+
+        if ($waitlist->status !== 'Notificado') {
+            return redirect()->back()->withErrors(['error' => 'Esta oferta no está activa o ya fue procesada.']);
+        }
+
+        // Update waitlist status to Cancelado
+        $waitlist->update([
+            'status' => 'Cancelado',
+        ]);
+
+        // Since the patient declined, this slot is now free again! 
+        // We notify the next patient in line.
+        if ($waitlist->specialty_id && $waitlist->professional_profile_id && $waitlist->offered_datetime) {
+            Waitlist::notifyNextInWaitlist(
+                $waitlist->specialty_id,
+                $waitlist->professional_profile_id,
+                $waitlist->offered_datetime
+            );
+        }
+
+        return redirect()->route('citas.index')->with('success', 'Has rechazado la hora sugerida. Tu solicitud en lista de espera ha sido cancelada.');
+    }
 }

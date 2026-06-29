@@ -48,9 +48,11 @@ class AdminWaitlistController extends Controller
         $doctor = ProfessionalProfile::with('user')->findOrFail($request->professional_profile_id);
         $specialtyName = $waitlist->specialty->name ?? 'Especialidad';
 
-        // Update the waitlist status
+        // Update the waitlist status, offered datetime, and professional profile
         $waitlist->update([
             'status' => 'Notificado',
+            'offered_datetime' => $request->start_datetime,
+            'professional_profile_id' => $request->professional_profile_id,
             'managed_by' => Auth::id(),
         ]);
 

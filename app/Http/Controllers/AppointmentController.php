@@ -22,8 +22,14 @@ class AppointmentController extends Controller
             ->orderBy('start_datetime', 'asc') // Ordenamos desde la cita más próxima a la más lejana
             ->get();
 
+        // 1.1 Buscamos ofertas de lista de espera notificadas para el paciente.
+        $waitlistOffers = \App\Models\Waitlist::with(['specialty', 'professionalProfile.user'])
+            ->where('patient_id', Auth::id())
+            ->where('status', 'Notificado')
+            ->get();
+
         // 2. Enviamos la variable a una nueva vista
-        return view('citas.index', compact('misCitas'));
+        return view('citas.index', compact('misCitas', 'waitlistOffers'));
     }
 
     public function create()

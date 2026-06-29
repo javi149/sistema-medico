@@ -117,6 +117,10 @@ Route::middleware(['auth', 'role:paciente'])->group(function () {
     Route::get('/citas/{cita}/edit', [AppointmentController::class, 'edit'])->name('citas.edit');
     Route::patch('/citas/{cita}', [AppointmentController::class, 'updatePaciente'])->name('citas.update');
 
+    // RUTAS DE LISTA DE ESPERA (ACEPTAR / RECHAZAR)
+    Route::post('/waitlist/{waitlist}/accept', [\App\Http\Controllers\WaitlistController::class, 'accept'])->name('waitlist.accept');
+    Route::post('/waitlist/{waitlist}/decline', [\App\Http\Controllers\WaitlistController::class, 'decline'])->name('waitlist.decline');
+
 });
 // ==========================================================
 // 4. RUTAS DEL MÉDICO

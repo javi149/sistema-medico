@@ -249,4 +249,112 @@ class WaitlistTest extends TestCase
                    $mail->slotTime === $appointmentTime;
         });
     }
+
+    /**
+     * Test patient can view their waitlist offer.
+     */
+    public function test_patient_can_view_waitlist_offer(): void
+    {
+        Waitlist::create([
+            'patient_id' => $this->patient1->id,
+            'specialty_id' => $this->specialty->id,
+            'professional_profile_id' => $this->profileId,
+            'offered_datetime' => now()->addDays(2)->format('Y-m-d H:i:s'),
+            'status' => 'Notificado',
+        ]);
+
+        $response = $this->actingAs($this->patient1)->get('/citas');
+        $response->assertStatus(200);
+        $response->assertSee('¡Cupo Disponible en Lista de Espera!');
+        $response->assertSee($this->doctor->name);
+    }
+
+    /**
+     * Test patient can accept a waitlist offer.
+     */
+    public function test_patient_can_accept_waitlist_offer(): void
+    {
+        Mail::fake();
+
+        $offeredTime = now()->addDays(2)->format('Y-m-d H:i:s');
+        $waitlist = Waitlist::create([
+            'patient_id' => $this->patient1->id,
+            'specialty_id' => $this->specialty->id,
+            'professional_profile_id' => $this->profileId,
+            'offered_datetime' => $offeredTime,
+            'status' => 'Notificado',
+        ]);
+
+        $response = $this->actingAs($this->patient1)
+            ->post("/waitlist/{$waitlist->id}/accept");
+
+        $response->assertRedirect('/citas');
+        $response->assertSessionHas('success', '¡Cupo aceptado con éxito! Tu cita médica ha sido agendada.');
+
+        // Verify appointment was created
+        $this->assertDatabaseHas('appointments', [
+            'patient_id' => $this->patient1->id,
+            'professional_profile_id' => $this->profileId,
+            'specialty_id' => $this->specialty->id,
+            'start_datetime' => $offeredTime,
+            'status' => 'reservada',
+        ]);
+
+        // Verify waitlist is Reasignado
+        $this->assertDatabaseHas('waitlists', [
+            'id' => $waitlist->id,
+            'status' => 'Reasignado',
+        ]);
+    }
+
+    /**
+     * Test patient can decline waitlist offer, which notifies the next patient in line.
+     */
+    public function test_patient_can_decline_waitlist_offer_and_notifies_next_in_line(): void
+    {
+        Mail::fake();
+
+        $offeredTime = now()->addDays(2)->format('Y-m-d H:i:s');
+        
+        // Patient 1 has an offer
+        $waitlist1 = Waitlist::create([
+            'patient_id' => $this->patient1->id,
+            'specialty_id' => $this->specialty->id,
+            'professional_profile_id' => $this->profileId,
+            'offered_datetime' => $offeredTime,
+            'status' => 'Notificado',
+        ]);
+
+        // Patient 2 is next in line (pending)
+        $waitlist2 = Waitlist::create([
+            'patient_id' => $this->patient2->id,
+            'specialty_id' => $this->specialty->id,
+            'status' => 'Pendiente',
+        ]);
+
+        // Patient 1 declines the offer
+        $response = $this->actingAs($this->patient1)
+            ->post("/waitlist/{$waitlist1->id}/decline");
+
+        $response->assertRedirect('/citas');
+        $response->assertSessionHas('success');
+
+        // Verify waitlist 1 is Cancelado
+        $this->assertDatabaseHas('waitlists', [
+            'id' => $waitlist1->id,
+            'status' => 'Cancelado',
+        ]);
+
+        // Verify waitlist 2 was notified automatically because the slot was declined
+        $this->assertDatabaseHas('waitlists', [
+            'id' => $waitlist2->id,
+            'status' => 'Notificado',
+            'offered_datetime' => $offeredTime,
+        ]);
+
+        // Verify email was sent to patient 2
+        Mail::assertSent(WaitlistSlotFreed::class, function (WaitlistSlotFreed $mail) {
+            return $mail->hasTo($this->patient2->email);
+        });
+    }
 }
