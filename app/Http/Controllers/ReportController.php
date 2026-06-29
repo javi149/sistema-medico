@@ -48,10 +48,15 @@ class ReportController extends Controller
                 u.name AS medico_nombre,
                 COUNT(ap.id) AS total_citas,
                 SUM(CASE WHEN ap.status ILIKE '%cancelada%' THEN 1 ELSE 0 END) AS total_canceladas,
+                SUM(CASE WHEN ap.status ILIKE '%ausente%' THEN 1 ELSE 0 END) AS total_deserciones,
                 CASE 
                     WHEN COUNT(ap.id) = 0 THEN 0
                     ELSE ROUND((SUM(CASE WHEN ap.status ILIKE '%cancelada%' THEN 1 ELSE 0 END)::numeric / COUNT(ap.id)::numeric) * 100, 1)
-                END AS porcentaje_cancelacion
+                END AS porcentaje_cancelacion,
+                CASE 
+                    WHEN COUNT(ap.id) = 0 THEN 0
+                    ELSE ROUND((SUM(CASE WHEN ap.status ILIKE '%ausente%' THEN 1 ELSE 0 END)::numeric / COUNT(ap.id)::numeric) * 100, 1)
+                END AS porcentaje_desercion
             FROM users u
             INNER JOIN professional_profiles pp ON u.id = pp.user_id
             LEFT JOIN appointments ap ON pp.id = ap.professional_profile_id

@@ -14,9 +14,9 @@ class AppointmentNotificationTest extends TestCase
 {
     use RefreshDatabase;
 
-    private $patient;
-    private $doctor;
-    private $profileId;
+    private User $patient;
+    private User $doctor;
+    private int $profileId;
 
     protected function setUp(): void
     {
@@ -54,6 +54,13 @@ class AppointmentNotificationTest extends TestCase
     {
         Mail::fake();
 
+        // Crear una especialidad para la prueba
+        $specialtyId = DB::table('specialties')->insertGetId([
+            'name' => 'Cardiología',
+            'description' => 'Especialidad en el corazón',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
         // Crear una especialidad para asociarla a la cita
         $specialty = \App\Models\Specialty::create(['name' => 'Pediatría']);
 
@@ -61,6 +68,9 @@ class AppointmentNotificationTest extends TestCase
         $appointment = Appointment::create([
             'patient_id' => $this->patient->id,
             'professional_profile_id' => $this->profileId,
+            'specialty_id' => $specialtyId,
+            'start_datetime' => '2026-06-20 10:00:00',
+            'status' => 'reservada',
             'specialty_id' => $specialty->id,
             'start_datetime' => now()->addDays(2)->format('Y-m-d H:i:s'),
             'status' => 'Agendada',
@@ -77,14 +87,14 @@ class AppointmentNotificationTest extends TestCase
         // Verificar cambio en base de datos
         $this->assertDatabaseHas('appointments', [
             'id' => $appointment->id,
-            'status' => 'Cancelada',
+            'status' => 'cancelada',
         ]);
 
         // Verificar envío de correo por Mailtrap/Mail
         Mail::assertSent(AppointmentNotification::class, function (AppointmentNotification $mail) {
             return $mail->hasTo('paciente@example.com') &&
                    $mail->actionType === 'Cancelada' &&
-                   $mail->appointment->status === 'Cancelada';
+                   $mail->appointment->status === 'cancelada';
         });
     }
 
@@ -95,6 +105,13 @@ class AppointmentNotificationTest extends TestCase
     {
         Mail::fake();
 
+        // Crear una especialidad para la prueba
+        $specialtyId = DB::table('specialties')->insertGetId([
+            'name' => 'Cardiología',
+            'description' => 'Especialidad en el corazón',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
         // Crear una especialidad para asociarla a la cita
         $specialty = \App\Models\Specialty::create(['name' => 'Pediatría']);
 
@@ -102,6 +119,9 @@ class AppointmentNotificationTest extends TestCase
         $appointment = Appointment::create([
             'patient_id' => $this->patient->id,
             'professional_profile_id' => $this->profileId,
+            'specialty_id' => $specialtyId,
+            'start_datetime' => '2026-06-20 10:00:00',
+            'status' => 'reservada',
             'specialty_id' => $specialty->id,
             'start_datetime' => now()->addDays(2)->format('Y-m-d H:i:s'),
             'status' => 'Agendada',
@@ -109,6 +129,7 @@ class AppointmentNotificationTest extends TestCase
 
         // Nuevos datos para la cita
         $newDetails = [
+            'start_datetime' => '2026-06-25 11:00:00',
             'start_datetime' => now()->addDays(5)->format('Y-m-d H:i:s'),
         ];
 
@@ -123,6 +144,16 @@ class AppointmentNotificationTest extends TestCase
         // Verificar cambios en base de datos
         $this->assertDatabaseHas('appointments', [
             'id' => $appointment->id,
+            'start_datetime' => '2026-06-25 11:00:00',
+            'status' => 'modificada',
+        ]);
+
+        // Verificar envío de correo por Mailtrap/Mail
+        Mail::assertSent(AppointmentNotification::class, function (AppointmentNotification $mail) {
+        return $mail->hasTo('paciente@example.com') &&
+           $mail->actionType === 'Modificada' &&
+           $mail->appointment->status === 'modificada' &&
+           $mail->appointment->start_datetime->format('Y-m-d H:i:s') === '2026-06-25 11:00:00';
             'start_datetime' => $newDetails['start_datetime'],
             'status' => 'Modificada',
         ]);
