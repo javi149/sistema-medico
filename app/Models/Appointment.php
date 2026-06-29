@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Appointment extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'patient_id',
         'professional_profile_id',
@@ -17,12 +15,14 @@ class Appointment extends Model
         'status',
     ];
 
+    protected $casts = [
+        'start_datetime' => 'datetime',
+    ];
+
     public function patient()
     {
         return $this->belongsTo(User::class, 'patient_id');
     }
-
-
 
     public function professionalProfile()
     {

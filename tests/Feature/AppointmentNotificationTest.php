@@ -14,9 +14,9 @@ class AppointmentNotificationTest extends TestCase
 {
     use RefreshDatabase;
 
-    private $patient;
-    private $doctor;
-    private $profileId;
+    private User $patient;
+    private User $doctor;
+    private int $profileId;
 
     protected function setUp(): void
     {
@@ -134,10 +134,10 @@ class AppointmentNotificationTest extends TestCase
 
         // Verificar envío de correo por Mailtrap/Mail
         Mail::assertSent(AppointmentNotification::class, function (AppointmentNotification $mail) {
-            return $mail->hasTo('paciente@example.com') &&
-                   $mail->actionType === 'Modificada' &&
-                   $mail->appointment->status === 'modificada' &&
-                   $mail->appointment->start_datetime === '2026-06-25 11:00:00';
+        return $mail->hasTo('paciente@example.com') &&
+           $mail->actionType === 'Modificada' &&
+           $mail->appointment->status === 'modificada' &&
+           $mail->appointment->start_datetime->format('Y-m-d H:i:s') === '2026-06-25 11:00:00';
         });
     }
 }
