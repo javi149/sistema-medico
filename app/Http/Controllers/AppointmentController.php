@@ -2,27 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\AppointmentNotification;
 use App\Models\Appointment;
 use App\Models\ProfessionalProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 
 class AppointmentController extends Controller
 {
     /**
-     * Listar las citas del paciente logueado.
+     * Display a listing of the resource.
      */
     public function index()
     {
+        // 1. Buscamos solo las citas del paciente logueado.
+        // Usamos 'with' para traer los datos del médico y la especialidad en una sola consulta.
         $misCitas = Appointment::with(['professionalProfile.user', 'specialty'])
             ->where('patient_id', Auth::id())
-            ->orderBy('start_datetime', 'asc')
+            ->orderBy('start_datetime', 'asc') // Ordenamos desde la cita más próxima a la más lejana
             ->get();
 
-        return view('citas.index', compact('misCitas'));
         // 1.1 Buscamos ofertas de lista de espera notificadas para el paciente.
         $waitlistOffers = \App\Models\Waitlist::with(['specialty', 'professionalProfile.user'])
             ->where('patient_id', Auth::id())
@@ -33,22 +32,7 @@ class AppointmentController extends Controller
         return view('citas.index', compact('misCitas', 'waitlistOffers'));
     }
 
-    /**
-     * Formulario para crear una nueva cita.
-     */
     public function create()
-    {
-        // Traemos todos los perfiles profesionales, junto con los datos de su usuario (nombre) 
-        // y sus especialidades para mostrarlos en el menú desplegable.
-        $perfiles = ProfessionalProfile::with(['user', 'specialties'])->get();
-
-        return view('citas.create', compact('perfiles'));
-    }
-
-    /**
-     * Guardar una nueva cita con protección contra doble reserva.
-     */
-    public function store(Request $request)
     {
         $specialties = \App\Models\Specialty::all();
         return view('citas.create', compact('specialties'));
@@ -68,16 +52,6 @@ class AppointmentController extends Controller
         $request->validate([
             'patient_id' => 'required|exists:users,id',
             'professional_profile_id' => 'required|exists:professional_profiles,id',
-            'start_datetime'          => 'required|date|after:now',
-        ]);
-
-        try {
-            DB::transaction(function () use ($request) {
-
-                // Bloqueo pesimista para evitar doble reserva concurrente
-                $conflicto = Appointment::where('professional_profile_id', $request->professional_profile_id)
-                    ->where('start_datetime', $request->start_datetime)
-                    ->whereIn('status', ['reservada', 'confirmada'])
             'start_datetime' => 'required|date|after:now', // Regla: No agendar en el pasado
         ]);
 
@@ -98,9 +72,6 @@ class AppointmentController extends Controller
                     ->first();
 
                 if ($conflicto) {
-                    throw new \Exception('Lo sentimos, este bloque horario acaba de ser reservado por otro paciente.');
-                }
-
                     // Rompemos la transacción lanzando una excepción si el bloque ya fue tomado
                     throw new \Exception('Lo sentimos, este bloque horario acaba de ser reservado por otro paciente.');
                 }
@@ -108,27 +79,27 @@ class AppointmentController extends Controller
                 // 4. INTEGRIDAD REFERENCIAL COMPLEJA
                 // Obtenemos la especialidad del médico para asegurar consistencia en reportes futuros
                 $perfil = ProfessionalProfile::with('specialties')->findOrFail($request->professional_profile_id);
-
+                
+                // Validamos que el médico tenga al menos una especialidad asignada
                 if ($perfil->specialties->isEmpty()) {
                     throw new \Exception('El médico seleccionado no tiene especialidades registradas.');
                 }
+                
+                $especialidad_id = $perfil->specialties->first()->id;
 
-                Appointment::create([
-                    'patient_id'              => Auth::id(),
                 
                 // 4. Guardamos la cita definitiva en la base de datos
                 $createdAppointment = Appointment::create([
                     'patient_id' => $request->patient_id, // Usamos el paciente validado del wizard
                     'professional_profile_id' => $request->professional_profile_id,
-                    'specialty_id'            => $perfil->specialties->first()->id,
-                    'start_datetime'          => $request->start_datetime,
-                    'status'                  => 'reservada',
+                    'specialty_id' => $especialidad_id,
+                    'start_datetime' => $request->start_datetime,
+                    'status' => 'reservada',
                 ]);
                 
                 return $createdAppointment;
             });
 
-            return redirect()->back()->with('success', '¡Tu cita médica ha sido agendada con éxito!');
             // 5. Enviar el correo electrónico
             \Illuminate\Support\Facades\Mail::to($appointment->patient->email)->send(new \App\Mail\AppointmentBooked($appointment));
 
@@ -136,6 +107,7 @@ class AppointmentController extends Controller
             return redirect()->route('citas.success', $appointment->id);
 
         } catch (\Exception $e) {
+            // Si algo falla (como el error del bloque ocupado), lo atrapamos y mostramos el mensaje rojo
             return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }
     }
@@ -146,9 +118,6 @@ class AppointmentController extends Controller
     }
 
     /**
-     * Cancelar una cita (acción del paciente desde su portal).
-     * Solo puede cancelar sus propias citas y solo si están en estado "reservada".
-     */
      * Display the specified resource.
      */
     public function show(string $id)
@@ -235,34 +204,31 @@ class AppointmentController extends Controller
 
     public function cancelar(Appointment $cita)
     {
+        // 1. Capa de Seguridad: Validamos que la cita pertenezca al usuario logueado
         if ($cita->patient_id !== Auth::id()) {
             abort(403, 'Acción no autorizada. No puedes cancelar citas de otros pacientes.');
         }
 
-        if ($cita->status !== 'reservada') {
-            return redirect()->back()->withErrors(['error' => 'Esta cita no se puede cancelar en su estado actual.']);
+        // 2. Regla de Negocio: Solo podemos cancelar citas que estén "reservadas"
+        if ($cita->status === 'reservada') {
+            
+            // 3. La actualización en la base de datos
+            $cita->update(['status' => 'cancelada']);
+            
+            return redirect()->back()->with('success', 'Tu cita ha sido anulada exitosamente. El bloque ha sido liberado.');
         }
 
-        $cita->update(['status' => 'cancelada']);
-
-        return redirect()->back()->with('success', 'Tu cita ha sido anulada exitosamente. El bloque ha sido liberado.');
+        // Si intentan cancelar una cita que ya fue atendida o cancelada previamente
+        return redirect()->back()->withErrors(['error' => 'Esta cita no se puede cancelar en su estado actual.']);
     }
-
-    /**
-     * Cancelar una cita desde el panel de administración y notificar al paciente por email.
     /**
      * Cancelar una cita médica y notificar al paciente.
      */
-    public function cancel(string $id)
+    public function cancel($id)
     {
-        $appointment = Appointment::with('patient')->findOrFail($id);
+        // 1. Buscar la cita en PostgreSQL
+        $appointment = Appointment::findOrFail($id);
 
-        $appointment->status = 'cancelada';
-        $appointment->save();
-
-        Mail::to($appointment->patient->email)->send(
-            new AppointmentNotification($appointment, 'Cancelada')
-        );
         // 2. Cambiar el estado a Cancelada
         $appointment->status = 'cancelada';
         $appointment->save();
@@ -283,19 +249,10 @@ class AppointmentController extends Controller
     }
 
     /**
-     * Modificar una cita desde el panel de administración y notificar al paciente por email.
+     * Modificar una cita médica y notificar al paciente.
      */
-    public function update(Request $request,string $id)
+    public function update(Request $request, $id)
     {
-        $appointment = Appointment::with('patient')->findOrFail($id);
-
-        $appointment->fill($request->only(['start_datetime']));
-        $appointment->status = 'modificada';
-        $appointment->save();
-
-        Mail::to($appointment->patient->email)->send(
-            new AppointmentNotification($appointment, 'Modificada')
-        );
         $request->validate([
             'start_datetime' => 'sometimes|date|after:now',
             'specialty_id' => 'sometimes|exists:specialties,id',
@@ -323,25 +280,6 @@ class AppointmentController extends Controller
         return redirect()->back()->with('success', 'Cita modificada con éxito y notificación enviada.');
     }
 
-    // ---------------------------------------------------------------
-    // Métodos del CRUD estándar (pendientes de implementar)
-    // ---------------------------------------------------------------
-
-    public function show(string $id)
-    {
-        //
-    }
-
-    public function edit(string $id)
-    {
-        //
-    }
-
-    public function destroy(string $id)
-    {
-        //
-    }
-}
     public function checkRut(Request $request)
     {
         $request->validate(['rut' => ['required', new \App\Rules\ValidRut]]);
