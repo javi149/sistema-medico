@@ -98,6 +98,8 @@
         .sidebar a svg { width: 18px; height: 18px; opacity: 0.7; transition: all 0.2s; }
         .sidebar a:hover { background-color: rgba(255,255,255,0.05); color: white; }
         .sidebar a:hover svg { opacity: 1; color: var(--primary-light); }
+        .sidebar a.active { background: rgba(20, 184, 166, 0.15); color: white; }
+        .sidebar a.active svg { opacity: 1; color: var(--primary-light); }
         .sidebar .section-label { color: #475569; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin: 20px 0 10px 15px; letter-spacing: 1px; }
 
         /* --- MAIN CONTENT --- */
@@ -227,7 +229,7 @@
         <div style="flex: 1; overflow-y: auto;">
             @role('admin')
                 <p class="section-label">General</p>
-                <a href="{{ route('admin.dashboard') }}">
+                <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                     Dashboard
                 </a>
@@ -245,7 +247,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
                     Especialidades
                 </a>
-                <a href="{{ route('reportes.index') }}">
+                <a href="{{ route('reportes.index') }}" class="{{ request()->routeIs('reportes.index') ? 'active' : '' }}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
                     Reportes
                 </a>
