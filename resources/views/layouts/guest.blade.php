@@ -4,128 +4,299 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-
-        <title>{{ config('app.name', 'MediCore') }} - Acceso</title>
-
+        <title>{{ config('app.name', 'MediCore') }}</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         <style>
+            *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
             body {
-                font-family: 'Plus Jakarta Sans', sans-serif !important;
-            }
-            .auth-bg {
-                background: linear-gradient(to bottom right, #f0fdfa, #ccfbf1);
+                font-family: 'Plus Jakarta Sans', sans-serif;
+                display: flex;
                 min-height: 100vh;
+                background: #f8fafc;
+            }
+
+            /* ── PANEL IZQUIERDO OSCURO ── */
+            .auth-left {
+                width: 50%;
+                background: linear-gradient(160deg, #0f172a 0%, #0f2d2b 60%, #134e4a 100%);
                 display: flex;
                 flex-direction: column;
-                justify-content: center;
-                align-items: center;
+                justify-content: space-between;
+                padding: 3rem;
                 position: relative;
                 overflow: hidden;
-                padding-top: 20px;
             }
-            .auth-card {
-                width: 100%;
-                max-width: 28rem;
-                padding: 2.5rem;
-                background: rgba(255, 255, 255, 0.8);
-                backdrop-filter: blur(20px);
-                -webkit-backdrop-filter: blur(20px);
-                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-                border-radius: 30px !important;
-                border: 1px solid rgba(255, 255, 255, 0.6) !important;
-                position: relative;
-                z-index: 10;
-                margin-top: 2rem;
-            }
-            @media (max-width: 640px) {
-                .auth-card {
-                    border-radius: 0px !important;
-                    border: none !important;
-                    box-shadow: none !important;
-                    background: white;
-                }
-            }
-            .blob {
+            .auth-left::before {
+                content: '';
                 position: absolute;
+                top: -100px; left: -100px;
+                width: 500px; height: 500px;
+                background: radial-gradient(circle, rgba(20,184,166,0.15) 0%, transparent 70%);
+                pointer-events: none;
+            }
+            .auth-left::after {
+                content: '';
+                position: absolute;
+                bottom: -80px; right: -80px;
+                width: 400px; height: 400px;
+                background: radial-gradient(circle, rgba(15,118,110,0.2) 0%, transparent 70%);
+                pointer-events: none;
+            }
+            .auth-logo {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                color: #14b8a6;
+                font-size: 1.5rem;
+                font-weight: 800;
+                text-decoration: none;
+                position: relative;
+                z-index: 2;
+            }
+            .auth-logo svg { stroke: #14b8a6; }
+
+            .auth-hero {
+                position: relative;
+                z-index: 2;
+            }
+            .auth-hero h1 {
+                font-size: 2.8rem;
+                font-weight: 800;
+                color: #f8fafc;
+                line-height: 1.15;
+                margin-bottom: 1rem;
+            }
+            .auth-hero h1 span { color: #14b8a6; }
+            .auth-hero p {
+                color: #94a3b8;
+                font-size: 1rem;
+                line-height: 1.6;
+                max-width: 380px;
+            }
+
+            .auth-stats {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+                position: relative;
+                z-index: 2;
+            }
+            .stat-card {
+                background: rgba(255,255,255,0.05);
+                border: 1px solid rgba(255,255,255,0.08);
+                border-radius: 14px;
+                padding: 1rem;
+            }
+            .stat-card .stat-num {
+                font-size: 1.6rem;
+                font-weight: 800;
+                color: #14b8a6;
+            }
+            .stat-card .stat-label {
+                font-size: 0.75rem;
+                color: #64748b;
+                margin-top: 2px;
+            }
+
+            .auth-avatars {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                position: relative;
+                z-index: 2;
+            }
+            .avatar-stack { display: flex; }
+            .avatar-stack .av {
+                width: 34px; height: 34px;
                 border-radius: 50%;
-                mix-blend-mode: multiply;
-                opacity: 0.2;
-                z-index: 1;
+                border: 2px solid #0f172a;
+                margin-left: -8px;
+                font-size: 0.7rem;
+                font-weight: 700;
+                display: flex; align-items: center; justify-content: center;
+                color: white;
             }
-            .blob-1 { top: -10%; left: -10%; width: 24rem; height: 24rem; background: #0f766e; filter: blur(80px); animation: blob 10s infinite alternate; }
-            .blob-2 { top: 20%; right: -10%; width: 30rem; height: 30rem; background: #14b8a6; filter: blur(100px); animation: blob 10s infinite alternate 2s; }
-            .blob-3 { bottom: -20%; left: 20%; width: 25rem; height: 25rem; background: #2dd4bf; filter: blur(80px); animation: blob 10s infinite alternate 4s; }
-            
-            @keyframes blob {
-                0% { transform: translate(0px, 0px) scale(1); }
-                33% { transform: translate(40px, -60px) scale(1.1); }
-                66% { transform: translate(-30px, 30px) scale(0.9); }
-                100% { transform: translate(0px, 0px) scale(1); }
+            .avatar-stack .av:first-child { margin-left: 0; }
+            .av-teal   { background: #0f766e; }
+            .av-cyan   { background: #0891b2; }
+            .av-slate  { background: #475569; }
+            .av-purple { background: #7c3aed; }
+            .av-more   { background: rgba(255,255,255,0.15); font-size: 0.65rem; }
+            .auth-avatars span {
+                font-size: 0.82rem;
+                color: #94a3b8;
             }
-            /* Override Laravel defaults */
-            button[type="submit"], .bg-gray-800 {
-                background-color: #0f766e !important;
-                border-radius: 50px !important;
-                padding: 12px 24px !important;
-                font-weight: 700 !important;
-                letter-spacing: 0.5px;
-                transition: background 0.3s !important;
-                color: white !important;
-                border: none !important;
-                width: auto !important;
+            .auth-avatars strong { color: #e2e8f0; }
+
+            /* ── PANEL DERECHO FORMULARIO ── */
+            .auth-right {
+                width: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 3rem;
+                background: #f8fafc;
             }
-            button[type="submit"]:hover, .bg-gray-800:hover {
-                background-color: #115e59 !important;
+            .auth-form-wrap {
+                width: 100%;
+                max-width: 420px;
             }
-            input[type="email"], input[type="password"], input[type="text"] {
-                border-radius: 12px !important;
-                border: 1px solid #cbd5e1 !important;
-                background: white !important;
-                padding: 12px 16px !important;
-                width: 100% !important;
-                box-shadow: none !important;
+            .auth-form-wrap h2 {
+                font-size: 2rem;
+                font-weight: 800;
+                color: #0f172a;
+                margin-bottom: 6px;
             }
-            input[type="email"]:focus, input[type="password"]:focus, input[type="text"]:focus {
-                border-color: #0f766e !important;
-                outline: none !important;
-                box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.2) !important;
+            .auth-form-wrap .auth-subtitle {
+                font-size: 0.9rem;
+                color: #64748b;
+                margin-bottom: 2rem;
             }
-            a {
-                color: #0f766e !important;
+
+            /* Inputs */
+            .form-group { margin-bottom: 1.2rem; }
+            .form-group label {
+                display: block;
                 font-weight: 600;
-                text-decoration: none !important;
+                font-size: 0.9rem;
+                color: #334155;
+                margin-bottom: 6px;
             }
-            a:hover {
-                color: #115e59 !important;
+            .form-group input[type="email"],
+            .form-group input[type="password"],
+            .form-group input[type="text"] {
+                width: 100%;
+                padding: 13px 16px;
+                border: 1.5px solid #e2e8f0;
+                border-radius: 12px;
+                font-size: 0.95rem;
+                font-family: inherit;
+                color: #0f172a;
+                background: white;
+                transition: border-color 0.2s, box-shadow 0.2s;
+                outline: none;
             }
-            label {
-                font-weight: 600 !important;
-                color: #334155 !important;
+            .form-group input:focus {
+                border-color: #0f766e;
+                box-shadow: 0 0 0 3px rgba(15,118,110,0.12);
             }
+
+            /* Botón submit */
+            .btn-submit {
+                background: #0f766e;
+                color: white;
+                border: none;
+                border-radius: 50px;
+                padding: 13px 28px;
+                font-size: 0.9rem;
+                font-weight: 700;
+                font-family: inherit;
+                letter-spacing: 0.5px;
+                cursor: pointer;
+                transition: background 0.2s;
+            }
+            .btn-submit:hover { background: #115e59; }
+
+            /* Fila inferior del form */
+            .auth-form-footer {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-top: 1.5rem;
+            }
+            .auth-form-footer a, .auth-form-footer-center a {
+                font-size: 0.88rem;
+                color: #0f766e;
+                font-weight: 600;
+                text-decoration: none;
+            }
+            .auth-form-footer a:hover { color: #115e59; }
+            .auth-form-footer-center {
+                text-align: center;
+                margin-top: 1.5rem;
+            }
+
+            /* Checkbox */
+            .remember-row {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-top: 0.8rem;
+            }
+            .remember-row input[type="checkbox"] {
+                width: 16px; height: 16px;
+                accent-color: #0f766e;
+                cursor: pointer;
+            }
+            .remember-row label {
+                font-size: 0.88rem;
+                color: #64748b;
+                cursor: pointer;
+            }
+
+            /* Error messages */
+            .field-error {
+                font-size: 0.8rem;
+                color: #ef4444;
+                margin-top: 4px;
+            }
+
+            /* Responsive */
+            @@media (max-width: 768px) {
+                .auth-left { display: none; }
+                .auth-right { width: 100%; padding: 2rem 1.5rem; }
+            }
+
         </style>
     </head>
     <body>
-        <div class="auth-bg">
-            
-            <!-- Elementos decorativos de fondo (Blobs) -->
-            <div class="blob blob-1"></div>
-            <div class="blob blob-2"></div>
-            <div class="blob blob-3"></div>
+        <!-- Panel Izquierdo -->
+        <div class="auth-left">
+            <a href="/" class="auth-logo">
+                <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                </svg>
+                MediCore
+            </a>
 
-            <div class="z-10" style="text-align: center; position: relative;">
-                <a href="/" style="display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 2.5rem; font-weight: 800; color: #0f766e; text-decoration: none;">
-                    <svg viewBox="0 0 24 24" width="45" height="45" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
-                    MediCore
-                </a>
-                <p style="text-align: center; font-size: 0.95rem; font-weight: 600; margin-top: 5px; color: #0f766e; opacity: 0.8;">Plataforma Médica Integral</p>
+            <div class="auth-hero">
+                <h1>La clínica del<br>futuro, <span>hoy.</span></h1>
+                <p>Gestiona citas, profesionales y reportes desde un solo lugar. Diseñado para equipos médicos que priorizan la eficiencia y la experiencia del paciente.</p>
             </div>
 
-            <!-- Tarjeta Glassmorphism -->
-            <div class="auth-card">
+            <div class="auth-stats">
+                <div class="stat-card">
+                    <div class="stat-num">+80</div>
+                    <div class="stat-label">Médicos activos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-num">99%</div>
+                    <div class="stat-label">Uptime del sistema</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-num">3</div>
+                    <div class="stat-label">Portales de acceso</div>
+                </div>
+            </div>
+
+            <div class="auth-avatars">
+                <div class="avatar-stack">
+                    <div class="av av-teal">KR</div>
+                    <div class="av av-cyan">MS</div>
+                    <div class="av av-slate">AS</div>
+                    <div class="av av-purple">HK</div>
+                    <div class="av av-more">+76</div>
+                </div>
+                <span>Únete a <strong>+80 profesionales</strong> registrados</span>
+            </div>
+        </div>
+
+        <!-- Panel Derecho -->
+        <div class="auth-right">
+            <div class="auth-form-wrap">
                 {{ $slot }}
-            </div>
-            
-            <div class="z-10 mt-8 text-sm" style="color: #64748b; font-weight: 500;">
-                &copy; {{ date('Y') }} Clínica MediCore. Todos los derechos reservados.
             </div>
         </div>
     </body>
