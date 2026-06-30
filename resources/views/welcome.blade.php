@@ -457,27 +457,7 @@
         </div>
     </div>
 
-    <!-- Express Banner -->
-    <div class="bento-hero" style="margin-bottom: 80px;">
-        <div class="bento-card" style="background: #f8fafc; padding: 0; min-height: 200px;">
-            <div style="background: var(--bg-card); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--primary);">
-                <svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31"></path><path d="M14 9.3V1.99"></path><path d="M8.5 2h7"></path><path d="M14 9.3a6.5 6.5 0 1 1-4 0"></path><path d="M5.52 16h12.96"></path></svg>
-            </div>
-        </div>
-        <div class="bento-card" style="display: flex; flex-direction: column; justify-content: center;">
-            <h2 style="margin: 0 0 10px 0;">Análisis expres</h2>
-            <p style="color: var(--text-muted); margin-bottom: 20px;">Realizamos un amplio espectro de exámenes de laboratorio necesarios para detectar patologías en etapas tempranas.</p>
-            <div style="display: flex; gap: 10px;">
-                @if (Route::has('login'))
-                    @auth
-                        <a href="{{ url('/dashboard') }}" class="btn-primary" style="padding: 8px 20px; font-size: 0.9rem;">Agendar examen</a>
-                    @else
-                        <a href="{{ route('citas.create') }}" class="btn-primary" style="padding: 8px 20px; font-size: 0.9rem;">Agendar examen</a>
-                    @endauth
-                @endif
-            </div>
-        </div>
-    </div>
+
 
     <!-- Doctors Section -->
     <div id="doctores">
