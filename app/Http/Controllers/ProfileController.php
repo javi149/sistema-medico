@@ -16,8 +16,76 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $user = $request->user();
+
+        if ($user->hasRole('paciente')) {
+            // 1. Buscamos todas las citas del paciente ordenadas de la más reciente a la más antigua
+            $citas = \App\Models\Appointment::with(['professionalProfile.user', 'specialty'])
+                ->where('patient_id', $user->id)
+                ->orderBy('start_datetime', 'desc')
+                ->get();
+
+            // 2. Buscamos la próxima cita programada (futura)
+            $proximaCita = \App\Models\Appointment::with(['professionalProfile.user', 'specialty'])
+                ->where('patient_id', $user->id)
+                ->where('start_datetime', '>', now())
+                ->whereIn('status', ['reservada', 'confirmada', 'Modificada', 'modificada'])
+                ->orderBy('start_datetime', 'asc')
+                ->first();
+
+            // 3. Estadísticas clave
+            $totalCitas = $citas->count();
+            $atendidas = $citas->where('status', 'atendida')->count();
+            $ausentes = $citas->where('status', 'ausente')->count();
+            $canceladas = $citas->where('status', 'cancelada')->count();
+            $programadas = $citas->filter(fn($c) => in_array(strtolower($c->status), ['reservada', 'confirmada', 'modificada']))->count();
+
+            // Tasa de asistencia (porcentaje de citas atendidas sobre las citas no canceladas)
+            $citasValidas = $totalCitas - $canceladas;
+            $tasaAsistencia = $citasValidas > 0 ? round(($atendidas / $citasValidas) * 100) : 0;
+
+            // 4. Profesionales frecuentes (médicos con los que más se ha atendido)
+            $medicosFrecuentes = $citas->groupBy('professional_profile_id')
+                ->map(function ($group) {
+                    $first = $group->first();
+                    return [
+                        'count' => $group->count(),
+                        'name' => $first->professionalProfile->user->name ?? 'Médico Asignado',
+                        'specialty' => $first->specialty->name ?? 'General',
+                        'email' => $first->professionalProfile->user->email ?? '',
+                    ];
+                })
+                ->sortByDesc('count')
+                ->take(3);
+
+            // 5. Especialidades (áreas) más consultadas
+            $especialidadesFrecuentes = $citas->groupBy('specialty_id')
+                ->map(function ($group) {
+                    return [
+                        'count' => $group->count(),
+                        'name' => $group->first()->specialty->name ?? 'General',
+                    ];
+                })
+                ->sortByDesc('count')
+                ->take(5);
+
+            return view('profile.edit', compact(
+                'user',
+                'citas',
+                'proximaCita',
+                'totalCitas',
+                'atendidas',
+                'ausentes',
+                'canceladas',
+                'programadas',
+                'tasaAsistencia',
+                'medicosFrecuentes',
+                'especialidadesFrecuentes'
+            ));
+        }
+
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
         ]);
     }
 
