@@ -10,7 +10,7 @@
     }
 
     .profile-header {
-        background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+        background: linear-gradient(135deg, #0f766e 0%, #0f172a 100%);
         color: white;
         border-radius: 24px;
         padding: 35px;
@@ -56,7 +56,7 @@
         justify-content: center;
         font-size: 2rem;
         font-weight: 800;
-        color: white;
+        color: rgb(255, 255, 255);
         text-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
@@ -71,6 +71,7 @@
         font-weight: 800;
         margin: 0;
         letter-spacing: -0.5px;
+        color: #ffffff;
     }
 
     .profile-role {
