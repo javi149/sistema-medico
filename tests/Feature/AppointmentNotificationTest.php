@@ -77,7 +77,7 @@ class AppointmentNotificationTest extends TestCase
         // Verificar cambio en base de datos
         $this->assertDatabaseHas('appointments', [
             'id' => $appointment->id,
-            'status' => 'Cancelada',
+            'status' => 'cancelada',
         ]);
 
         // Verificar envío de correo por Mailtrap/Mail
