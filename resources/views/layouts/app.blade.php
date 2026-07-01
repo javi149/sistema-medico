@@ -157,7 +157,12 @@
         }
         .profile-detail-item svg { width: 18px; height: 18px; opacity: 0.9; }
 
-        /* Top Bar */
+        /* Ajustes para textos dentro del banner */
+        .profile-header .page-title { color: white; font-size: 1.3rem; margin: 0; }
+        .profile-header .page-subtitle { color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-top: 3px; font-weight: 500; }
+        .profile-header .text-muted { color: rgba(255, 255, 255, 0.7) !important; }
+
+        /* Top Bar (mantener para vistas antiguas hasta que se migren todas) */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -347,29 +352,37 @@
         @auth
             <!-- GLOBAL PROFILE BANNER -->
             <div class="profile-header">
-                <div class="profile-header-info">
-                    <div class="profile-avatar-large">
-                        {{ substr(Auth::user()->name, 0, 1) }}
-                    </div>
-                    <div class="profile-meta">
-                        <h2 class="profile-name">{{ Auth::user()->name }}</h2>
-                        <span class="profile-role">
-                            @if(Auth::user()->hasRole('paciente')) Paciente @elseif(Auth::user()->hasRole('medico')) Médico @else Administrador @endif
-                        </span>
-                    </div>
-                </div>
-                <div class="profile-details-list">
-                    <div class="profile-detail-item">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                        <span style="font-weight: 600;">{{ Auth::user()->email }}</span>
-                    </div>
-                    @if(Auth::user()->rut)
-                        <div class="profile-detail-item">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                            <span>RUT: <strong style="font-weight: 700;">{{ Auth::user()->rut }}</strong></span>
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 20px;">
+                    <div class="profile-header-info">
+                        <div class="profile-avatar-large">
+                            {{ substr(Auth::user()->name, 0, 1) }}
                         </div>
-                    @endif
+                        <div class="profile-meta">
+                            <h2 class="profile-name">{{ Auth::user()->name }}</h2>
+                            <span class="profile-role">
+                                @if(Auth::user()->hasRole('paciente')) Paciente @elseif(Auth::user()->hasRole('medico')) Médico @else Administrador @endif
+                            </span>
+                        </div>
+                    </div>
+                    <div class="profile-details-list">
+                        <div class="profile-detail-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            <span style="font-weight: 600;">{{ Auth::user()->email }}</span>
+                        </div>
+                        @if(Auth::user()->rut)
+                            <div class="profile-detail-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                <span>RUT: <strong style="font-weight: 700;">{{ Auth::user()->rut }}</strong></span>
+                            </div>
+                        @endif
+                    </div>
                 </div>
+
+                @hasSection('header_context')
+                    <div style="width: 100%; border-top: 1px solid rgba(255, 255, 255, 0.15); margin-top: 10px; padding-top: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                        @yield('header_context')
+                    </div>
+                @endif
             </div>
         @endauth
 

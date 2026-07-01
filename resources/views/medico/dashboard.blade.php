@@ -2,18 +2,18 @@
 
 @section('content')
 
-    <div class="top-bar">
-        <div>
-            <h1 class="page-title">Mantente al día, {{ Auth::user()->name }}</h1>
-            <p class="page-subtitle">Gestión de pacientes y rondas diarias: <strong>{{ \Carbon\Carbon::now()->translatedFormat('d F, Y') }}</strong></p>
-        </div>
-        <div style="display: flex; gap: 10px;">
-            <button class="btn btn-primary">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                Agregar Evento
-            </button>
-        </div>
+@section('header_context')
+    <div>
+        <h1 class="page-title">Agenda Diaria</h1>
+        <p class="page-subtitle">Gestión de pacientes y rondas: <strong>{{ \Carbon\Carbon::now()->translatedFormat('d F, Y') }}</strong></p>
     </div>
+    <div style="display: flex; gap: 10px;">
+        <button class="btn btn-primary" style="background: rgba(255,255,255,0.2); box-shadow: none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Agregar Evento
+        </button>
+    </div>
+@endsection
 
     <!-- CALENDAR LIKE VIEW -->
     <div style="background: var(--bg-card); border-radius: 20px; border: 1px solid var(--border-color); padding: 30px; box-shadow: var(--shadow-sm);">
