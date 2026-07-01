@@ -4,7 +4,7 @@
 
     <div class="top-bar">
         <div>
-            <h1 class="page-title">Mantente al día, Dr(a). {{ explode(' ', Auth::user()->name)[0] }}</h1>
+            <h1 class="page-title">Mantente al día, {{ Auth::user()->name }}</h1>
             <p class="page-subtitle">Gestión de pacientes y rondas diarias: <strong>{{ \Carbon\Carbon::now()->translatedFormat('d F, Y') }}</strong></p>
         </div>
         <div style="display: flex; gap: 10px;">
