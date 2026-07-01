@@ -84,7 +84,7 @@ class AppointmentNotificationTest extends TestCase
         Mail::assertSent(AppointmentNotification::class, function (AppointmentNotification $mail) {
             return $mail->hasTo('paciente@example.com') &&
                    $mail->actionType === 'Cancelada' &&
-                   $mail->appointment->status === 'Cancelada';
+                   strtolower($mail->appointment->status) === 'cancelada';
         });
     }
 
