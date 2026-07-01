@@ -18,23 +18,20 @@ class AdminDashboardController extends Controller
             $hoy = Carbon::today();
         }
 
-        // 2. Agregaciones estadísticas optimizadas para los cuadros superiores del Mockup
-        $totalCitas = Appointment::whereDate('start_datetime', $hoy)->count();
-        
-        $confirmadas = Appointment::whereDate('start_datetime', $hoy)
-            ->whereIn('status', ['reservada', 'confirmada', 'Modificada', 'modificada'])->count();
-            
-        $atendidas = Appointment::whereDate('start_datetime', $hoy)
-            ->whereIn('status', ['atendida', 'Atendida'])->count();
-            
-        $ausentes = Appointment::whereDate('start_datetime', $hoy)
-            ->whereIn('status', ['ausente', 'Ausente'])->count();
-
-        // 3. Agenda del día con Carga Ansiosa (Eager Loading) de relaciones triples
+        // 2. Agenda del día con Carga Ansiosa (Eager Loading)
         $agenda = Appointment::with(['patient', 'professionalProfile.user', 'specialty'])
             ->whereDate('start_datetime', $hoy)
             ->orderBy('start_datetime', 'asc')
             ->get();
+
+        // 3. Agregaciones estadísticas optimizadas en memoria (evita 4 queries a la BD)
+        $totalCitas = $agenda->count();
+        
+        $confirmadas = $agenda->filter(fn($c) => in_array(strtolower($c->status), ['reservada', 'confirmada', 'modificada']))->count();
+            
+        $atendidas = $agenda->filter(fn($c) => strtolower($c->status) === 'atendida')->count();
+            
+        $ausentes = $agenda->filter(fn($c) => strtolower($c->status) === 'ausente')->count();
 
         // 4. Despachamos el set de datos consolidado a la vista administrativa
         return view('admin.dashboard', compact(
