@@ -38,9 +38,9 @@ class DatabaseSeeder extends Seeder
         $this->command->info('Creando 50 pacientes...');
         
         $testPaciente = User::firstOrCreate(
-            ['email' => 'adanramos@alu.unach.cl'],
+            ['email' => 'paciente@test.com'],
             [
-                'name' => 'Adán Ramos',
+                'name' => 'Paciente Prueba',
                 'rut' => '12.345.678-9',
                 'password' => Hash::make('password123'),
                 'email_verified_at' => now(),
@@ -59,20 +59,30 @@ class DatabaseSeeder extends Seeder
         $perfiles = [];
         $rutCounter = 10000000;
         $defaultPassword = Hash::make('password123');
+        $createdTestDoctor = false;
 
         foreach ($specialties as $specialty) {
             for ($i = 0; $i < 5; $i++) {
+                // Configurar cuenta de doctor específica para testing la primera vez
+                if (!$createdTestDoctor) {
+                    $email = 'gconn@example.net';
+                    $password = Hash::make('password');
+                    $createdTestDoctor = true;
+                } else {
+                    $email = fake()->unique()->safeEmail();
+                    $password = $defaultPassword;
+                }
+
                 // Alternar entre hombre y mujer para las imágenes
                 $isFemale = ($i % 2 === 0);
                 $name = $isFemale ? 'Dra. ' . fake()->firstNameFemale() . ' ' . fake()->lastName() : 'Dr. ' . fake()->firstNameMale() . ' ' . fake()->lastName();
-                $email = fake()->unique()->safeEmail();
                 $rut = strval($rutCounter++) . '-' . rand(0, 9);
 
                 $medico = User::create([
                     'name' => $name,
                     'rut' => $rut,
                     'email' => $email,
-                    'password' => $defaultPassword,
+                    'password' => $password,
                     'email_verified_at' => now(),
                 ]);
 
