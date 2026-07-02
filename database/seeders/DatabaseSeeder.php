@@ -27,15 +27,15 @@ class DatabaseSeeder extends Seeder
         $admin = User::where('email', 'admin@clinica.cl')->first();
 
         // =====================================================
-        // 1. TABLA MANTENEDORA: ESPECIALIDADES (20 registros)
+        // 1. TABLA MANTENEDORA: ESPECIALIDADES (10 registros)
         // =====================================================
-        $this->command->info('Creando 20 especialidades médicas...');
-        $specialties = Specialty::factory(20)->create();
+        $this->command->info('Creando 10 especialidades médicas...');
+        $specialties = Specialty::factory(10)->create();
 
         // =====================================================
-        // 2. TABLA MANTENEDORA: PACIENTES (60 registros)
+        // 2. TABLA MANTENEDORA: PACIENTES (50 registros)
         // =====================================================
-        $this->command->info('Creando 60 pacientes...');
+        $this->command->info('Creando 50 pacientes...');
         
         $testPaciente = User::firstOrCreate(
             ['email' => 'adanramos@alu.unach.cl'],
@@ -48,20 +48,20 @@ class DatabaseSeeder extends Seeder
         );
         $testPaciente->assignRole($rolePaciente);
 
-        $pacientes = User::factory(59)->create();
+        $pacientes = User::factory(49)->create();
         // El UserFactory ya asigna rol 'paciente' automáticamente en afterCreating
 
         // =====================================================
-        // 3. TABLA MANTENEDORA: MÉDICOS + PERFILES (4 por especialidad)
+        // 3. TABLA MANTENEDORA: MÉDICOS + PERFILES (5 por especialidad)
         // =====================================================
-        $this->command->info('Creando 4 médicos por cada especialidad (' . ($specialties->count() * 4) . ' en total)...');
+        $this->command->info('Creando 5 médicos por cada especialidad (' . ($specialties->count() * 5) . ' en total)...');
 
         $perfiles = [];
         $rutCounter = 10000000;
         $defaultPassword = Hash::make('password123');
 
         foreach ($specialties as $specialty) {
-            for ($i = 0; $i < 4; $i++) {
+            for ($i = 0; $i < 5; $i++) {
                 // Alternar entre hombre y mujer para las imágenes
                 $isFemale = ($i % 2 === 0);
                 $name = $isFemale ? 'Dra. ' . fake()->firstNameFemale() . ' ' . fake()->lastName() : 'Dr. ' . fake()->firstNameMale() . ' ' . fake()->lastName();
