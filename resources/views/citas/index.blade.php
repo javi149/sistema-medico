@@ -2,16 +2,16 @@
 
 @section('content')
 
-    <div class="top-bar">
-        <div>
-            <h1 class="page-title">Historial de Citas Médicas</h1>
-            <p class="page-subtitle">Revisa tus citas programadas y tu historial de atenciones.</p>
-        </div>
-        <a href="{{ route('citas.create') }}" class="btn btn-primary">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            Agendar Nueva Hora
-        </a>
+@section('header_context')
+    <div>
+        <h1 class="page-title">Historial de Citas Médicas</h1>
+        <p class="page-subtitle">Revisa tus citas programadas y tu historial de atenciones.</p>
     </div>
+    <a href="{{ route('citas.create') }}" class="btn btn-primary" style="background: rgba(255,255,255,0.2); box-shadow: none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        Agendar Nueva Hora
+    </a>
+@endsection
 
     @if(isset($waitlistOffers) && !$waitlistOffers->isEmpty())
         <div style="margin-bottom: 30px; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border: 1px solid #7dd3fc; border-radius: 20px; padding: 25px; box-shadow: var(--shadow-md);">

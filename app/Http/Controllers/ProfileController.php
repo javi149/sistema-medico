@@ -19,21 +19,20 @@ class ProfileController extends Controller
         $user = $request->user();
 
         if ($user->hasRole('paciente')) {
-            // 1. Buscamos todas las citas del paciente ordenadas de la más reciente a la más antigua
+            // 1. Buscamos todas las citas del paciente (una sola query con eager loading)
             $citas = \App\Models\Appointment::with(['professionalProfile.user', 'specialty'])
                 ->where('patient_id', $user->id)
                 ->orderBy('start_datetime', 'desc')
                 ->get();
 
-            // 2. Buscamos la próxima cita programada (futura)
-            $proximaCita = \App\Models\Appointment::with(['professionalProfile.user', 'specialty'])
-                ->where('patient_id', $user->id)
-                ->where('start_datetime', '>', now())
-                ->whereIn('status', ['reservada', 'confirmada', 'Modificada', 'modificada'])
-                ->orderBy('start_datetime', 'asc')
+            // 2. Próxima cita programada: la derivamos de la colección ya cargada (sin query extra)
+            $proximaCita = $citas
+                ->filter(fn($c) => \Carbon\Carbon::parse($c->start_datetime)->isFuture()
+                    && in_array(strtolower($c->status), ['reservada', 'confirmada', 'modificada']))
+                ->sortBy('start_datetime')
                 ->first();
 
-            // 3. Estadísticas clave
+            // 3. Estadísticas clave (todo desde la colección en memoria)
             $totalCitas = $citas->count();
             $atendidas = $citas->where('status', 'atendida')->count();
             $ausentes = $citas->where('status', 'ausente')->count();

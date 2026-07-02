@@ -2,22 +2,22 @@
 
 @section('content')
 
-    <div class="top-bar">
-        <div>
-            <h1 class="page-title">Control Diario de Citas</h1>
-            <p class="page-subtitle">Gestión y supervisión de la agenda clínica.</p>
-        </div>
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <form action="{{ route('admin.dashboard') }}" method="GET" style="display: flex; align-items: center; gap: 10px; margin: 0;">
-                <label for="date-select" style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Agenda del día:</label>
-                <input type="date" id="date-select" name="date" value="{{ $hoy->format('Y-m-d') }}" onchange="this.form.submit()" style="padding: 8px 12px; border-radius: 50px; border: 1px solid var(--border-color); font-family: inherit; font-size: 0.9rem; outline: none; background: white; color: var(--text-main); font-weight: 600; cursor: pointer; transition: all 0.2s;" onfocus="this.style.borderColor='var(--primary-light)'" onblur="this.style.borderColor='var(--border-color)'">
-            </form>
-            <a href="{{ route('admin.appointments.create') }}" class="btn btn-primary" style="padding: 8px 18px; font-size: 0.85rem;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                Agendar Hora
-            </a>
-        </div>
+@section('header_context')
+    <div>
+        <h1 class="page-title">Control Diario de Citas</h1>
+        <p class="page-subtitle">Gestión y supervisión de la agenda clínica.</p>
     </div>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <form action="{{ route('admin.dashboard') }}" method="GET" style="display: flex; align-items: center; gap: 10px; margin: 0;">
+            <label for="date-select" style="font-size: 0.85rem; font-weight: 700; color: rgba(255,255,255,0.7); text-transform: uppercase;">Agenda del día:</label>
+            <input type="date" id="date-select" name="date" value="{{ $hoy->format('Y-m-d') }}" onchange="this.form.submit()" style="padding: 8px 12px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); font-family: inherit; font-size: 0.9rem; outline: none; background: rgba(255,255,255,0.1); color: white; font-weight: 600; cursor: pointer; transition: all 0.2s;" onfocus="this.style.borderColor='white'" onblur="this.style.borderColor='rgba(255,255,255,0.2)'">
+        </form>
+        <a href="{{ route('admin.appointments.create') }}" class="btn btn-primary" style="padding: 8px 18px; font-size: 0.85rem; background: rgba(255,255,255,0.2); box-shadow: none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Agendar Hora
+        </a>
+    </div>
+@endsection
 
     <!-- STATS CARDS -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 40px;">

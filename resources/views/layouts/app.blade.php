@@ -108,7 +108,61 @@
             position: relative;
         }
 
-        /* Top Bar */
+        /* --- GLOBAL PROFILE BANNER --- */
+        .profile-header {
+            background: linear-gradient(135deg, #0f766e 0%, #0f172a 100%);
+            color: white;
+            border-radius: 24px;
+            padding: 25px 35px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .profile-header-info { display: flex; align-items: center; gap: 20px; z-index: 1; }
+        .profile-avatar-large {
+            width: 65px; height: 65px; border-radius: 50%; background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px); border: 2px solid rgba(255, 255, 255, 0.4);
+            display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
+            font-weight: 800; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .profile-meta { display: flex; flex-direction: column; gap: 4px; }
+        .profile-name { font-size: 1.5rem; font-weight: 800; margin: 0; letter-spacing: -0.5px; color: #ffffff; }
+        .profile-role {
+            font-size: 0.8rem; background: rgba(255, 255, 255, 0.2); padding: 4px 12px;
+            border-radius: 100px; width: fit-content; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .profile-details-list { display: flex; gap: 20px; flex-wrap: wrap; z-index: 1; }
+        .profile-detail-item {
+            display: flex; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.1);
+            padding: 10px 18px; border-radius: 12px; backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1); font-size: 0.9rem;
+        }
+        .profile-detail-item svg { width: 18px; height: 18px; opacity: 0.9; }
+
+        /* Ajustes para textos dentro del banner */
+        .profile-header .page-title { color: white; font-size: 1.3rem; margin: 0; }
+        .profile-header .page-subtitle { color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-top: 3px; font-weight: 500; }
+        .profile-header .text-muted { color: rgba(255, 255, 255, 0.7) !important; }
+
+        /* Top Bar (mantener para vistas antiguas hasta que se migren todas) */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -295,6 +349,43 @@
 
     <!-- MAIN AREA -->
     <div class="main-content">
+        @auth
+            <!-- GLOBAL PROFILE BANNER -->
+            <div class="profile-header">
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 20px;">
+                    <div class="profile-header-info">
+                        <div class="profile-avatar-large">
+                            {{ substr(Auth::user()->name, 0, 1) }}
+                        </div>
+                        <div class="profile-meta">
+                            <h2 class="profile-name">{{ Auth::user()->name }}</h2>
+                            <span class="profile-role">
+                                @if(Auth::user()->hasRole('paciente')) Paciente @elseif(Auth::user()->hasRole('medico')) Médico @else Administrador @endif
+                            </span>
+                        </div>
+                    </div>
+                    <div class="profile-details-list">
+                        <div class="profile-detail-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            <span style="font-weight: 600;">{{ Auth::user()->email }}</span>
+                        </div>
+                        @if(Auth::user()->rut)
+                            <div class="profile-detail-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                <span>RUT: <strong style="font-weight: 700;">{{ Auth::user()->rut }}</strong></span>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                @hasSection('header_context')
+                    <div style="width: 100%; border-top: 1px solid rgba(255, 255, 255, 0.15); margin-top: 10px; padding-top: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                        @yield('header_context')
+                    </div>
+                @endif
+            </div>
+        @endauth
+
         @if(session('success'))
             <div class="alert alert-success">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
