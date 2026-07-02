@@ -1,0 +1,27 @@
+config:
+  # Dirección local donde corre la aplicación
+  target: "http://127.0.0.1:8000"
+  phases:
+    - duration: 30
+      arrivalRate: 5
+      rampTo: 15
+      name: "Fase de Carga Inicial (Ramp-up)"
+    - duration: 20
+      arrivalRate: 50
+      name: "Fase de Estrés Máximo (Simulando 100 usuarios concurrentes)"
+  defaults:
+    headers:
+      Accept: "application/json"
+
+scenarios:
+  - name: "Flujo del Paciente en el Asistente de Citas"
+    flow:
+      # 1. Visitar la página de inicio
+      - get:
+          url: "/"
+      # 2. Cargar el asistente de citas
+      - get:
+          url: "/citas/create"
+      # 3. Consultar disponibilidad para especialidad de prueba
+      - get:
+          url: "/citas/wizard/availability?specialty_id=1&date=2026-07-06"

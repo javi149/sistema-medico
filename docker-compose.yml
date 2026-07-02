@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # Servicio de la aplicación Laravel (PHP 8.2 + Apache)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sistema_medico_app
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www/html
+    environment:
+      - APP_NAME=MediCore
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_URL=http://localhost:8000
+      - DB_CONNECTION=pgsql
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=sistema_medico
+      - DB_USERNAME=medico_user
+      - DB_PASSWORD=medico_secure_pass
+      - SESSION_DRIVER=database
+      - CACHE_STORE=database
+      - QUEUE_CONNECTION=database
+    depends_on:
+      - db
+
+  # Servicio de Base de Datos PostgreSQL
+  db:
+    image: postgres:15-alpine
+    container_name: sistema_medico_db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=sistema_medico
+      - POSTGRES_USER=medico_user
+      - POSTGRES_PASSWORD=medico_secure_pass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
