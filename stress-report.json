@@ -3,281 +3,104 @@
     "counters": {
       "vusers.created_by_name.Flujo del Paciente en el Asistente de Citas": 1300,
       "vusers.created": 1300,
-      "http.requests": 1301,
-      "http.codes.200": 1,
-      "http.responses": 1,
-      "http.downloaded_bytes": 29078,
-      "plugins.metrics-by-endpoint./.codes.200": 1,
-      "plugins.metrics-by-endpoint./.errors.ERR_SOCKET_TIMEOUT": 204,
-      "errors.ERR_SOCKET_TIMEOUT": 205,
-      "vusers.failed": 1300,
-      "plugins.metrics-by-endpoint./citas/create.errors.ERR_SOCKET_TIMEOUT": 1,
-      "plugins.metrics-by-endpoint./.errors.ECONNREFUSED": 1095,
-      "errors.ECONNREFUSED": 1095
+      "http.requests": 1300,
+      "plugins.metrics-by-endpoint./.errors.ECONNREFUSED": 1300,
+      "errors.ECONNREFUSED": 1300,
+      "vusers.failed": 1300
     },
     "rates": {
-      "http.request_rate": 28
+      "http.request_rate": 29
     },
-    "firstCounterAt": 1782946646779,
-    "firstHistogramAt": 1782946652397,
-    "lastCounterAt": 1782946696383,
-    "lastHistogramAt": 1782946652399,
-    "firstMetricAt": 1782946646779,
-    "lastMetricAt": 1782946696383,
-    "period": 1782946690000,
-    "summaries": {
-      "http.response_time": {
-        "min": 5596,
-        "max": 5596,
-        "count": 1,
-        "mean": 5596,
-        "p50": 5598.4,
-        "median": 5598.4,
-        "p75": 5598.4,
-        "p90": 5598.4,
-        "p95": 5598.4,
-        "p99": 5598.4,
-        "p999": 5598.4
-      },
-      "http.response_time.2xx": {
-        "min": 5596,
-        "max": 5596,
-        "count": 1,
-        "mean": 5596,
-        "p50": 5598.4,
-        "median": 5598.4,
-        "p75": 5598.4,
-        "p90": 5598.4,
-        "p95": 5598.4,
-        "p99": 5598.4,
-        "p999": 5598.4
-      },
-      "plugins.metrics-by-endpoint.response_time./": {
-        "min": 5596,
-        "max": 5596,
-        "count": 1,
-        "mean": 5596,
-        "p50": 5598.4,
-        "median": 5598.4,
-        "p75": 5598.4,
-        "p90": 5598.4,
-        "p95": 5598.4,
-        "p99": 5598.4,
-        "p999": 5598.4
-      }
-    },
-    "histograms": {
-      "http.response_time": {
-        "min": 5596,
-        "max": 5596,
-        "count": 1,
-        "mean": 5596,
-        "p50": 5598.4,
-        "median": 5598.4,
-        "p75": 5598.4,
-        "p90": 5598.4,
-        "p95": 5598.4,
-        "p99": 5598.4,
-        "p999": 5598.4
-      },
-      "http.response_time.2xx": {
-        "min": 5596,
-        "max": 5596,
-        "count": 1,
-        "mean": 5596,
-        "p50": 5598.4,
-        "median": 5598.4,
-        "p75": 5598.4,
-        "p90": 5598.4,
-        "p95": 5598.4,
-        "p99": 5598.4,
-        "p999": 5598.4
-      },
-      "plugins.metrics-by-endpoint.response_time./": {
-        "min": 5596,
-        "max": 5596,
-        "count": 1,
-        "mean": 5596,
-        "p50": 5598.4,
-        "median": 5598.4,
-        "p75": 5598.4,
-        "p90": 5598.4,
-        "p95": 5598.4,
-        "p99": 5598.4,
-        "p999": 5598.4
-      }
-    }
+    "firstCounterAt": 1782958172246,
+    "lastCounterAt": 1782958221856,
+    "firstMetricAt": 1782958172246,
+    "lastMetricAt": 1782958221856,
+    "period": 1782958220000,
+    "summaries": {},
+    "histograms": {}
   },
   "intermediate": [
     {
       "counters": {
-        "vusers.created_by_name.Flujo del Paciente en el Asistente de Citas": 20,
-        "vusers.created": 20,
-        "http.requests": 20
-      },
-      "rates": {
-        "http.request_rate": 7
-      },
-      "http.request_rate": null,
-      "firstCounterAt": 1782946646779,
-      "lastCounterAt": 1782946649991,
-      "firstMetricAt": 1782946646779,
-      "lastMetricAt": 1782946649991,
-      "period": "1782946640000",
-      "summaries": {},
-      "histograms": {}
-    },
-    {
-      "counters": {
-        "vusers.created_by_name.Flujo del Paciente en el Asistente de Citas": 75,
-        "vusers.created": 75,
-        "http.requests": 76,
-        "plugins.metrics-by-endpoint./.errors.ERR_SOCKET_TIMEOUT": 31,
-        "errors.ERR_SOCKET_TIMEOUT": 32,
-        "vusers.failed": 32,
-        "http.codes.200": 1,
-        "http.responses": 1,
-        "http.downloaded_bytes": 29078,
-        "plugins.metrics-by-endpoint./.codes.200": 1,
-        "plugins.metrics-by-endpoint./citas/create.errors.ERR_SOCKET_TIMEOUT": 1
+        "vusers.created_by_name.Flujo del Paciente en el Asistente de Citas": 50,
+        "vusers.created": 50,
+        "http.requests": 50,
+        "plugins.metrics-by-endpoint./.errors.ECONNREFUSED": 50,
+        "errors.ECONNREFUSED": 50,
+        "vusers.failed": 50
       },
       "rates": {
         "http.request_rate": 8
       },
       "http.request_rate": null,
-      "firstCounterAt": 1782946650050,
-      "firstHistogramAt": 1782946652397,
-      "lastCounterAt": 1782946659997,
-      "lastHistogramAt": 1782946652399,
-      "firstMetricAt": 1782946650050,
-      "lastMetricAt": 1782946659997,
-      "period": "1782946650000",
-      "summaries": {
-        "http.response_time": {
-          "min": 5596,
-          "max": 5596,
-          "count": 1,
-          "mean": 5596,
-          "p50": 5598.4,
-          "median": 5598.4,
-          "p75": 5598.4,
-          "p90": 5598.4,
-          "p95": 5598.4,
-          "p99": 5598.4,
-          "p999": 5598.4
-        },
-        "http.response_time.2xx": {
-          "min": 5596,
-          "max": 5596,
-          "count": 1,
-          "mean": 5596,
-          "p50": 5598.4,
-          "median": 5598.4,
-          "p75": 5598.4,
-          "p90": 5598.4,
-          "p95": 5598.4,
-          "p99": 5598.4,
-          "p999": 5598.4
-        },
-        "plugins.metrics-by-endpoint.response_time./": {
-          "min": 5596,
-          "max": 5596,
-          "count": 1,
-          "mean": 5596,
-          "p50": 5598.4,
-          "median": 5598.4,
-          "p75": 5598.4,
-          "p90": 5598.4,
-          "p95": 5598.4,
-          "p99": 5598.4,
-          "p999": 5598.4
-        }
-      },
-      "histograms": {
-        "http.response_time": {
-          "min": 5596,
-          "max": 5596,
-          "count": 1,
-          "mean": 5596,
-          "p50": 5598.4,
-          "median": 5598.4,
-          "p75": 5598.4,
-          "p90": 5598.4,
-          "p95": 5598.4,
-          "p99": 5598.4,
-          "p999": 5598.4
-        },
-        "http.response_time.2xx": {
-          "min": 5596,
-          "max": 5596,
-          "count": 1,
-          "mean": 5596,
-          "p50": 5598.4,
-          "median": 5598.4,
-          "p75": 5598.4,
-          "p90": 5598.4,
-          "p95": 5598.4,
-          "p99": 5598.4,
-          "p999": 5598.4
-        },
-        "plugins.metrics-by-endpoint.response_time./": {
-          "min": 5596,
-          "max": 5596,
-          "count": 1,
-          "mean": 5596,
-          "p50": 5598.4,
-          "median": 5598.4,
-          "p75": 5598.4,
-          "p90": 5598.4,
-          "p95": 5598.4,
-          "p99": 5598.4,
-          "p999": 5598.4
-        }
-      }
-    },
-    {
-      "counters": {
-        "vusers.created_by_name.Flujo del Paciente en el Asistente de Citas": 114,
-        "vusers.created": 114,
-        "http.requests": 114,
-        "plugins.metrics-by-endpoint./.errors.ERR_SOCKET_TIMEOUT": 83,
-        "errors.ERR_SOCKET_TIMEOUT": 83,
-        "vusers.failed": 86,
-        "plugins.metrics-by-endpoint./.errors.ECONNREFUSED": 3,
-        "errors.ECONNREFUSED": 3
-      },
-      "rates": {
-        "http.request_rate": 12
-      },
-      "http.request_rate": null,
-      "firstCounterAt": 1782946660027,
-      "lastCounterAt": 1782946669998,
-      "firstMetricAt": 1782946660027,
-      "lastMetricAt": 1782946669998,
-      "period": "1782946660000",
+      "firstCounterAt": 1782958172246,
+      "lastCounterAt": 1782958179823,
+      "firstMetricAt": 1782958172246,
+      "lastMetricAt": 1782958179823,
+      "period": "1782958170000",
       "summaries": {},
       "histograms": {}
     },
     {
       "counters": {
-        "plugins.metrics-by-endpoint./.errors.ERR_SOCKET_TIMEOUT": 90,
-        "errors.ERR_SOCKET_TIMEOUT": 90,
-        "vusers.failed": 367,
-        "vusers.created_by_name.Flujo del Paciente en el Asistente de Citas": 276,
-        "vusers.created": 276,
-        "http.requests": 276,
-        "plugins.metrics-by-endpoint./.errors.ECONNREFUSED": 277,
-        "errors.ECONNREFUSED": 277
+        "vusers.created_by_name.Flujo del Paciente en el Asistente de Citas": 94,
+        "vusers.created": 94,
+        "http.requests": 94,
+        "plugins.metrics-by-endpoint./.errors.ECONNREFUSED": 94,
+        "errors.ECONNREFUSED": 94,
+        "vusers.failed": 94
       },
       "rates": {
-        "http.request_rate": 29
+        "http.request_rate": 10
       },
       "http.request_rate": null,
-      "firstCounterAt": 1782946670000,
-      "lastCounterAt": 1782946679954,
-      "firstMetricAt": 1782946670000,
-      "lastMetricAt": 1782946679954,
-      "period": "1782946670000",
+      "firstCounterAt": 1782958180308,
+      "lastCounterAt": 1782958189971,
+      "firstMetricAt": 1782958180308,
+      "lastMetricAt": 1782958189971,
+      "period": "1782958180000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Flujo del Paciente en el Asistente de Citas": 127,
+        "vusers.created": 127,
+        "http.requests": 127,
+        "plugins.metrics-by-endpoint./.errors.ECONNREFUSED": 127,
+        "errors.ECONNREFUSED": 127,
+        "vusers.failed": 127
+      },
+      "rates": {
+        "http.request_rate": 13
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1782958190014,
+      "lastCounterAt": 1782958199850,
+      "firstMetricAt": 1782958190014,
+      "lastMetricAt": 1782958199850,
+      "period": "1782958190000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Flujo del Paciente en el Asistente de Citas": 444,
+        "vusers.created": 444,
+        "http.requests": 444,
+        "plugins.metrics-by-endpoint./.errors.ECONNREFUSED": 444,
+        "errors.ECONNREFUSED": 444,
+        "vusers.failed": 444
+      },
+      "rates": {
+        "http.request_rate": 43
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1782958200044,
+      "lastCounterAt": 1782958209997,
+      "firstMetricAt": 1782958200044,
+      "lastMetricAt": 1782958209997,
+      "period": "1782958200000",
       "summaries": {},
       "histograms": {}
     },
@@ -294,32 +117,32 @@
         "http.request_rate": 50
       },
       "http.request_rate": null,
-      "firstCounterAt": 1782946680003,
-      "lastCounterAt": 1782946689953,
-      "firstMetricAt": 1782946680003,
-      "lastMetricAt": 1782946689953,
-      "period": "1782946680000",
+      "firstCounterAt": 1782958210012,
+      "lastCounterAt": 1782958219997,
+      "firstMetricAt": 1782958210012,
+      "lastMetricAt": 1782958219997,
+      "period": "1782958210000",
       "summaries": {},
       "histograms": {}
     },
     {
       "counters": {
-        "vusers.created_by_name.Flujo del Paciente en el Asistente de Citas": 315,
-        "vusers.created": 315,
-        "http.requests": 315,
-        "plugins.metrics-by-endpoint./.errors.ECONNREFUSED": 315,
-        "errors.ECONNREFUSED": 315,
-        "vusers.failed": 315
+        "vusers.created_by_name.Flujo del Paciente en el Asistente de Citas": 85,
+        "vusers.created": 85,
+        "http.requests": 85,
+        "plugins.metrics-by-endpoint./.errors.ECONNREFUSED": 85,
+        "errors.ECONNREFUSED": 85,
+        "vusers.failed": 85
       },
       "rates": {
-        "http.request_rate": 50
+        "http.request_rate": 57
       },
       "http.request_rate": null,
-      "firstCounterAt": 1782946690003,
-      "lastCounterAt": 1782946696383,
-      "firstMetricAt": 1782946690003,
-      "lastMetricAt": 1782946696383,
-      "period": "1782946690000",
+      "firstCounterAt": 1782958220012,
+      "lastCounterAt": 1782958221856,
+      "firstMetricAt": 1782958220012,
+      "lastMetricAt": 1782958221856,
+      "period": "1782958220000",
       "summaries": {},
       "histograms": {}
     }
