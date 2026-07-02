@@ -101,7 +101,12 @@ class AppointmentController extends Controller
             });
 
             // 5. Enviar el correo electrónico
-            \Illuminate\Support\Facades\Mail::to($appointment->patient->email)->send(new \App\Mail\AppointmentBooked($appointment));
+            $appointment->load('patient');
+            try {
+                \Illuminate\Support\Facades\Mail::to($appointment->patient->email)->send(new \App\Mail\AppointmentBooked($appointment));
+            } catch (\Exception $e) {
+                // No bloquear la respuesta si falla el correo
+            }
 
             // 6. Si la transacción termina con éxito, redirigimos a la pantalla de éxito
             return redirect()->route('citas.success', $appointment->id);
@@ -226,21 +231,16 @@ class AppointmentController extends Controller
      */
     public function cancel($id)
     {
-        // 1. Buscar la cita en PostgreSQL
-        $appointment = Appointment::findOrFail($id);
+        // 1. Buscar la cita en PostgreSQL con eager loading
+        $appointment = Appointment::with('patient')->findOrFail($id);
 
         // 2. Cambiar el estado a Cancelada
         $appointment->status = 'cancelada';
         $appointment->save();
 
-        // 3. Enviar correo de notificación
-        \Illuminate\Support\Facades\Mail::to($appointment->patient->email)->send(new \App\Mail\AppointmentNotification($appointment, 'Cancelada'));
-        // 3. Obtener el correo del usuario asociado a la cita
-        $userEmail = $appointment->patient->email;
-
-        // 4. Enviar el correo usando Mailtrap
+        // 3. Enviar correo de notificación (una sola vez)
         try {
-            \Illuminate\Support\Facades\Mail::to($userEmail)->send(new \App\Mail\AppointmentNotification($appointment, 'Cancelada'));
+            \Illuminate\Support\Facades\Mail::to($appointment->patient->email)->send(new \App\Mail\AppointmentNotification($appointment, 'Cancelada'));
         } catch (\Exception $e) {
             // Ignorar errores de correo local
         }
@@ -258,7 +258,7 @@ class AppointmentController extends Controller
             'specialty_id' => 'sometimes|exists:specialties,id',
         ]);
 
-        $appointment = Appointment::findOrFail($id);
+        $appointment = Appointment::with('patient')->findOrFail($id);
         
         // Actualizar los campos que vengan en la petición (fecha, hora de inicio, hora de término)
         $appointment->fill($request->only(['start_datetime', 'specialty_id']));
@@ -266,13 +266,9 @@ class AppointmentController extends Controller
         $appointment->status = 'Modificada';
         $appointment->save();
 
-        // Enviar correo de notificación de modificación
-        \Illuminate\Support\Facades\Mail::to($appointment->patient->email)->send(new \App\Mail\AppointmentNotification($appointment, 'Modificada'));
-        $userEmail = $appointment->patient->email;
-
-        // Enviar notificación de modificación
+        // Enviar correo de notificación de modificación (una sola vez)
         try {
-            \Illuminate\Support\Facades\Mail::to($userEmail)->send(new \App\Mail\AppointmentNotification($appointment, 'Modificada'));
+            \Illuminate\Support\Facades\Mail::to($appointment->patient->email)->send(new \App\Mail\AppointmentNotification($appointment, 'Modificada'));
         } catch (\Exception $e) {
             // Ignorar errores de correo local
         }
