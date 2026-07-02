@@ -11,33 +11,33 @@
     "rates": {
       "http.request_rate": 29
     },
-    "firstCounterAt": 1782953171543,
-    "lastCounterAt": 1782953221165,
-    "firstMetricAt": 1782953171543,
-    "lastMetricAt": 1782953221165,
-    "period": 1782953220000,
+    "firstCounterAt": 1782958172246,
+    "lastCounterAt": 1782958221856,
+    "firstMetricAt": 1782958172246,
+    "lastMetricAt": 1782958221856,
+    "period": 1782958220000,
     "summaries": {},
     "histograms": {}
   },
   "intermediate": [
     {
       "counters": {
-        "vusers.created_by_name.Flujo del Paciente en el Asistente de Citas": 57,
-        "vusers.created": 57,
-        "http.requests": 57,
-        "plugins.metrics-by-endpoint./.errors.ECONNREFUSED": 57,
-        "errors.ECONNREFUSED": 57,
-        "vusers.failed": 57
+        "vusers.created_by_name.Flujo del Paciente en el Asistente de Citas": 50,
+        "vusers.created": 50,
+        "http.requests": 50,
+        "plugins.metrics-by-endpoint./.errors.ECONNREFUSED": 50,
+        "errors.ECONNREFUSED": 50,
+        "vusers.failed": 50
       },
       "rates": {
-        "http.request_rate": 7
+        "http.request_rate": 8
       },
       "http.request_rate": null,
-      "firstCounterAt": 1782953171543,
-      "lastCounterAt": 1782953179992,
-      "firstMetricAt": 1782953171543,
-      "lastMetricAt": 1782953179992,
-      "period": "1782953170000",
+      "firstCounterAt": 1782958172246,
+      "lastCounterAt": 1782958179823,
+      "firstMetricAt": 1782958172246,
+      "lastMetricAt": 1782958179823,
+      "period": "1782958170000",
       "summaries": {},
       "histograms": {}
     },
@@ -54,53 +54,53 @@
         "http.request_rate": 10
       },
       "http.request_rate": null,
-      "firstCounterAt": 1782953180098,
-      "lastCounterAt": 1782953189960,
-      "firstMetricAt": 1782953180098,
-      "lastMetricAt": 1782953189960,
-      "period": "1782953180000",
+      "firstCounterAt": 1782958180308,
+      "lastCounterAt": 1782958189971,
+      "firstMetricAt": 1782958180308,
+      "lastMetricAt": 1782958189971,
+      "period": "1782958180000",
       "summaries": {},
       "histograms": {}
     },
     {
       "counters": {
-        "vusers.created_by_name.Flujo del Paciente en el Asistente de Citas": 131,
-        "vusers.created": 131,
-        "http.requests": 131,
-        "plugins.metrics-by-endpoint./.errors.ECONNREFUSED": 131,
-        "errors.ECONNREFUSED": 131,
-        "vusers.failed": 131
+        "vusers.created_by_name.Flujo del Paciente en el Asistente de Citas": 127,
+        "vusers.created": 127,
+        "http.requests": 127,
+        "plugins.metrics-by-endpoint./.errors.ECONNREFUSED": 127,
+        "errors.ECONNREFUSED": 127,
+        "vusers.failed": 127
       },
       "rates": {
         "http.request_rate": 13
       },
       "http.request_rate": null,
-      "firstCounterAt": 1782953190003,
-      "lastCounterAt": 1782953199935,
-      "firstMetricAt": 1782953190003,
-      "lastMetricAt": 1782953199935,
-      "period": "1782953190000",
+      "firstCounterAt": 1782958190014,
+      "lastCounterAt": 1782958199850,
+      "firstMetricAt": 1782958190014,
+      "lastMetricAt": 1782958199850,
+      "period": "1782958190000",
       "summaries": {},
       "histograms": {}
     },
     {
       "counters": {
-        "vusers.created_by_name.Flujo del Paciente en el Asistente de Citas": 465,
-        "vusers.created": 465,
-        "http.requests": 465,
-        "plugins.metrics-by-endpoint./.errors.ECONNREFUSED": 465,
-        "errors.ECONNREFUSED": 465,
-        "vusers.failed": 465
+        "vusers.created_by_name.Flujo del Paciente en el Asistente de Citas": 444,
+        "vusers.created": 444,
+        "http.requests": 444,
+        "plugins.metrics-by-endpoint./.errors.ECONNREFUSED": 444,
+        "errors.ECONNREFUSED": 444,
+        "vusers.failed": 444
       },
       "rates": {
-        "http.request_rate": 50
+        "http.request_rate": 43
       },
       "http.request_rate": null,
-      "firstCounterAt": 1782953200023,
-      "lastCounterAt": 1782953209929,
-      "firstMetricAt": 1782953200023,
-      "lastMetricAt": 1782953209929,
-      "period": "1782953200000",
+      "firstCounterAt": 1782958200044,
+      "lastCounterAt": 1782958209997,
+      "firstMetricAt": 1782958200044,
+      "lastMetricAt": 1782958209997,
+      "period": "1782958200000",
       "summaries": {},
       "histograms": {}
     },
@@ -117,32 +117,32 @@
         "http.request_rate": 50
       },
       "http.request_rate": null,
-      "firstCounterAt": 1782953210008,
-      "lastCounterAt": 1782953219930,
-      "firstMetricAt": 1782953210008,
-      "lastMetricAt": 1782953219930,
-      "period": "1782953210000",
+      "firstCounterAt": 1782958210012,
+      "lastCounterAt": 1782958219997,
+      "firstMetricAt": 1782958210012,
+      "lastMetricAt": 1782958219997,
+      "period": "1782958210000",
       "summaries": {},
       "histograms": {}
     },
     {
       "counters": {
-        "vusers.created_by_name.Flujo del Paciente en el Asistente de Citas": 53,
-        "vusers.created": 53,
-        "http.requests": 53,
-        "plugins.metrics-by-endpoint./.errors.ECONNREFUSED": 53,
-        "errors.ECONNREFUSED": 53,
-        "vusers.failed": 53
+        "vusers.created_by_name.Flujo del Paciente en el Asistente de Citas": 85,
+        "vusers.created": 85,
+        "http.requests": 85,
+        "plugins.metrics-by-endpoint./.errors.ECONNREFUSED": 85,
+        "errors.ECONNREFUSED": 85,
+        "vusers.failed": 85
       },
       "rates": {
-        "http.request_rate": 52
+        "http.request_rate": 57
       },
       "http.request_rate": null,
-      "firstCounterAt": 1782953220008,
-      "lastCounterAt": 1782953221165,
-      "firstMetricAt": 1782953220008,
-      "lastMetricAt": 1782953221165,
-      "period": "1782953220000",
+      "firstCounterAt": 1782958220012,
+      "lastCounterAt": 1782958221856,
+      "firstMetricAt": 1782958220012,
+      "lastMetricAt": 1782958221856,
+      "period": "1782958220000",
       "summaries": {},
       "histograms": {}
     }
